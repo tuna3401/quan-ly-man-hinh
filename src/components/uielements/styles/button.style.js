@@ -26,7 +26,7 @@ const Buttons = (ComponentName) => styled(ComponentName)`
     -ms-user-select: none;
     user-select: none;
     position: relative;
-    color: ${palette("text", 1)};
+    /* color: ${palette("text", 1)}; */
     border-color: ${palette("border", 0)};
     ${transition()};
 

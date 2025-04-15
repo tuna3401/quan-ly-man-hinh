@@ -77,7 +77,7 @@ const Topbar = (props) => {
   useEffect(() => {
     // props.checkKeKhai();
     dispatch(actionSidebar.getList());
-    dispatch(actions.getSoLieuCanhBao());
+    // dispatch(actions.getSoLieuCanhBao());
   }, []);
   const tenchucnang = localStorage.getItem("TenChucNang");
   const showDrawer = () => {

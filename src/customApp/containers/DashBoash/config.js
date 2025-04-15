@@ -1,42 +1,20 @@
-import {apiGetAuth, apiPostAuth} from '../../../api';
-import server from '../../../settings';
+import { apiGetAuth, apiPostAuth } from "../../../api";
+import server from "../../../settings";
 
 const apiUrl = {
-  danhsachdata: server.v2Url + 'DashBoard/GetDanhSachData',
-  getcoquanbyphamviid: server.v2Url + 'DashBoard/GetCoQuanByPhamViID',
-  danhsachcanhbao: server.v2Url + 'DashBoard/GetDanhSachData',
-  getallloaikhieuto: server.v2Url + 'TiepDan/DanhMucLoaiKhieuTo',
-  danhsachphanloaivuviec: server.v2Url + 'DashBoard/GetDanhSachData',
-//  danhsachcanhbaov2: server.v2Url + 'DashBoard/LayDanhSachCanhBao',
+  getdatadb: server.v2Url + "Dashboard/GetDashboard",
+  getdevice: server.v2Url + "Dashboard/GetThietBi",
 };
 const api = {
-  DanhSachData: (params) => {
-    return apiGetAuth(apiUrl.danhsachdata, {
+  GetDataDb: (params) => {
+    return apiGetAuth(apiUrl.getdatadb, {
       ...params,
     });
   },
-  DanhSachCanhBaoV2: (params) => {
-    return apiGetAuth(apiUrl.danhsachcanhbaov2, {
+  GetDevice: (params) => {
+    return apiGetAuth(apiUrl.getdevice, {
       ...params,
     });
-  },
-  GetCoQuanByPhamViID: (params) => {
-    return apiGetAuth(apiUrl.getcoquanbyphamviid, {
-      ...params,
-    });
-  },
-  DanhSachCanhBao: (params) => {
-    return apiGetAuth(apiUrl.danhsachcanhbao, {
-      ...params,
-    });
-  },
-  DanhSachPhanLoaiVuViec: (params) => {
-    return apiGetAuth(apiUrl.danhsachphanloaivuviec, {
-      ...params,
-    });
-  },
-  GetAllDanhMucLoaiKhieuTo: (params) => {
-    return apiGetAuth(apiUrl.getallloaikhieuto, {...params});
   },
 };
 

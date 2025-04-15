@@ -1,22 +1,24 @@
-import {all, takeEvery, put, call} from 'redux-saga/effects';
-import api from '../../../containers/DanhMuc/QLLichPhat/config';
-import actions from './actions';
-function* getInitData({payload}) {
+import { all, takeEvery, put, call } from "redux-saga/effects";
+import api from "../../../containers/DanhMuc/QLLichPhat/config";
+import apiDB from "../../../containers/DashBoash/config";
+import actions from "./actions";
+function* getInitData({ payload }) {
   try {
     const responseLoaiSuKien = yield call(
       api.danhSachLoaiSuKien,
-      payload.filterData,
+      payload.filterData
     );
     const responseMediaOrPhat = yield call(
       api.danhSachMediaorPhat,
-      payload.filterData,
+      payload.filterData
     );
     const responseManHinhOrNhomManHinh = yield call(
       api.danhSachManHinhOrNhomManHinh,
-      payload.filterData,
+      payload.filterData
     );
+    console.log(responseLoaiSuKien, "responseLoaiSuKien");
     yield put({
-      type: actions.NGHENHAN_GET_INIT_DATA_REQUEST_SUCCESS,
+      type: actions.SCHEDULEPLAYLIST_GET_INIT_DATA_REQUEST_SUCCESS,
       payload: {
         DanhSachLoaiSuKien: responseLoaiSuKien.data.Data,
         DanhSachMediaOrPhat: responseMediaOrPhat.data.Data,
@@ -25,36 +27,52 @@ function* getInitData({payload}) {
       },
     });
   } catch (e) {
+    console.log(e, "error");
     yield put({
-      type: actions.NGHENHAN_GET_INIT_DATA_REQUEST_ERROR,
+      type: actions.SCHEDULEPLAYLIST_GET_INIT_DATA_REQUEST_ERROR,
     });
   }
 }
-function* getList({payload}) {
+function* getList({ payload }) {
   try {
-    const response = yield call(api.danhSachNgheNhan, payload.filterData);
+    // apiDB.GetDataDb
+    console.log(payload, "payload");
+    const response = yield call(
+      payload.filterData.activeTab === "1"
+        ? api.danhSachNgheNhan
+        : apiDB.GetDataDb,
+      payload.filterData
+    );
+
     // const responseAll = yield call(api.danhSachHuongDan, {
     //   PageNumber: 1,
     //   PageSize: 1000,
     // });
     yield put({
-      type: actions.NGHENHAN_GET_LIST_REQUEST_SUCCESS,
+      type: actions.SCHEDULEPLAYLIST_GET_LIST_REQUEST_SUCCESS,
       payload: {
-        DanhSachNgheNhan: response.data.Data,
-        // AllHuongDan: responseAll.data.Data,
+        dataSchedulePlayList:
+          payload.filterData.activeTab === "1"
+            ? response.data.Data
+            : response.data.Data.LichPhats,
         TotalRow: response.data.TotalRow,
       },
     });
   } catch (e) {
     yield put({
-      type: actions.NGHENHAN_GET_LIST_REQUEST_ERROR,
+      type: actions.SCHEDULEPLAYLIST_GET_LIST_REQUEST_ERROR,
     });
   }
 }
 
 export default function* rootSaga() {
   yield all([
-    yield takeEvery(actions.NGHENHAN_GET_INIT_DATA_REQUEST, getInitData),
+    yield takeEvery(
+      actions.SCHEDULEPLAYLIST_GET_INIT_DATA_REQUEST,
+      getInitData
+    ),
   ]);
-  yield all([yield takeEvery(actions.NGHENHAN_GET_LIST_REQUEST, getList)]);
+  yield all([
+    yield takeEvery(actions.SCHEDULEPLAYLIST_GET_LIST_REQUEST, getList),
+  ]);
 }

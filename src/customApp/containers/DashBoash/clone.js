@@ -12,7 +12,7 @@ import {
   FaTimesCircle,
 } from "react-icons/fa";
 import Box from "../../../components/utility/box";
-import api from "./config";
+
 import {
   Button,
   DatePicker,
@@ -73,18 +73,18 @@ const DashBoard = (props) => {
 
   useEffect(() => {
     // Initialize charts when component mounts
-    if (typeof window !== "undefined" && dataDB) {
+    if (typeof window !== "undefined") {
       initializeCharts();
       generateCalendarData();
     }
-  }, [currentMonth, dataDB]);
+  }, [currentMonth]);
 
   const initializeCharts = () => {
     // Device Status Chart
     const deviceStatusCtx = document
       .getElementById("deviceStatusChart")
       ?.getContext("2d");
-    if (deviceStatusCtx && dataDB) {
+    if (deviceStatusCtx) {
       if (deviceStatusChartRef.current) {
         deviceStatusChartRef.current.destroy();
       }
@@ -94,11 +94,7 @@ const DashBoard = (props) => {
           labels: ["Hoạt động", "Tạm dừng", "Hết hạn"],
           datasets: [
             {
-              data: [
-                dataDB.TongSoThietBiOnline || 0,
-                dataDB.TongSoThietBiOffline || 0,
-                dataDB.TongSoThietBiHetHan || 0,
-              ],
+              data: [2, 2, 1],
               backgroundColor: ["#4CAF50", "#FF9800", "#F44336"],
               borderWidth: 0,
             },
@@ -163,7 +159,7 @@ const DashBoard = (props) => {
   const generateCalendarData = () => {
     // Parse month and year from currentMonth string
     const monthMatch = currentMonth.match(/Tháng (\d+), (\d+)/);
-    if (!monthMatch || !dataDB || !dataDB.LichPhats) return;
+    if (!monthMatch) return;
 
     const month = parseInt(monthMatch[1], 10) - 1; // 0-based month
     const year = parseInt(monthMatch[2], 10);
@@ -184,94 +180,15 @@ const DashBoard = (props) => {
       days.push({ day: i, events: [] });
     }
 
-    // Process events from API data
-    if (dataDB.LichPhats && dataDB.LichPhats.length > 0) {
-      dataDB.LichPhats.forEach((event) => {
-        // Determine color based on event type
-        let color = "#4CAF50"; // Default green
-        if (event.LoaiSuKien === 2) {
-          color = "#2196F3"; // Blue for Media
-        } else if (event.LoaiSuKien === 3) {
-          color = "#E91E63"; // Pink for other types
-        }
+    // Add mock events - in a real app, you would fetch events for the specific month
+    const mockEvents = getMockEventsForMonth(month, year);
 
-        if (event.ChiaNgay === true) {
-          // For events with ChiaNgay = true, display on specific NgayPhat date
-          if (event.NgayPhat) {
-            const eventDate = new Date(event.NgayPhat);
-            // Check if event is in the current month/year
-            if (
-              eventDate.getMonth() === month &&
-              eventDate.getFullYear() === year
-            ) {
-              const day = eventDate.getDate();
-              const dayIndex = day + startingDay - 1;
-
-              // Add event to the day
-              if (
-                dayIndex >= 0 &&
-                dayIndex < days.length &&
-                days[dayIndex].day !== ""
-              ) {
-                days[dayIndex].events.push({
-                  title: event.TenLichPhat,
-                  time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${
-                    event.GioKetThuc?.substring(0, 5) || "23:59"
-                  }`,
-                  color: color,
-                  eventData: event, // Store full event data for modal
-                });
-              }
-            }
-          }
-        } else {
-          // For events with ChiaNgay = false, display on all days from CreatedDate to EndDate
-          if (event.CreatedDate && event.EndDate) {
-            const startDate = new Date(event.CreatedDate);
-            const endDate = new Date(event.EndDate);
-
-            // Current month's date range
-            const currentMonthStart = new Date(year, month, 1);
-            const currentMonthEnd = new Date(year, month + 1, 0);
-
-            // Check if event period overlaps with current month
-            if (startDate <= currentMonthEnd && endDate >= currentMonthStart) {
-              // Calculate the range of days to display the event in current month
-              const rangeStart =
-                startDate > currentMonthStart ? startDate : currentMonthStart;
-              const rangeEnd =
-                endDate < currentMonthEnd ? endDate : currentMonthEnd;
-
-              // Add event to all days in the range
-              for (
-                let date = new Date(rangeStart);
-                date <= rangeEnd;
-                date.setDate(date.getDate() + 1)
-              ) {
-                if (date.getMonth() === month && date.getFullYear() === year) {
-                  const day = date.getDate();
-                  const dayIndex = day + startingDay - 1;
-
-                  if (
-                    dayIndex >= 0 &&
-                    dayIndex < days.length &&
-                    days[dayIndex].day !== ""
-                  ) {
-                    days[dayIndex].events.push({
-                      title: event.TenLichPhat,
-                      time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${
-                        event.GioKetThuc?.substring(0, 5) || "23:59"
-                      }`,
-                      color: color,
-                      eventData: event, // Store full event data for modal
-                    });
-                  }
-                }
-              }
-            }
-          }
-        }
-      });
+    // Add events to days
+    for (const [day, events] of Object.entries(mockEvents)) {
+      const dayIndex = parseInt(day) + startingDay - 1;
+      if (dayIndex >= 0 && dayIndex < days.length) {
+        days[dayIndex].events = events;
+      }
     }
 
     setCalendarDays(days);
@@ -443,75 +360,50 @@ const DashBoard = (props) => {
         ? "đang hoạt động"
         : status === "paused"
         ? "tạm dừng"
-        : status === "all"
-        ? ""
         : "hết hạn";
 
-    // Map status to API type parameter
-    const typeParam =
-      status === "active"
-        ? 1
-        : status === "paused"
-        ? 2
-        : status === "expired"
-        ? 3
-        : 0;
+    // Mock data for demonstration with more details matching the image
+    const mockDevices = [
+      {
+        id: 1,
+        name: "Go 1 - Màn hình 65",
+        status: status,
+        location: "55 Tô Ngọc Vân, P12/Q3, Tp.HCM",
+        temperature: "38°C",
+        ram: "4GB",
+        storage: "32GB",
+      },
+      {
+        id: 2,
+        name: "Go 2 - Màn hình 55",
+        status: status,
+        location: "123 Nguyễn Văn Linh, P.Tân Phong, Q7, Tp.HCM",
+        temperature: "36°C",
+        ram: "4GB",
+        storage: "32GB",
+      },
+    ];
 
-    // Set loading state
-    setDeviceList([]);
+    setDeviceListTitle(`Thiết bị ${statusText}`);
+    setDeviceList(mockDevices);
     setDeviceListModalVisible(true);
-    setDeviceListTitle(`Tổng danh sách thiết bị ${statusText}`);
-
-    // Call API to get device list
-    api
-      .GetDevice({ type: typeParam })
-      .then((res) => {
-        console.log(res, "res");
-        if (res && res.data.Status > 0) {
-          // Transform API data to match our device list format
-          const devices = res.data.Data.map((device) => ({
-            ...device,
-            id: device.ThietBiID || device.ID,
-            name: device.TenManHinh,
-            status: status,
-            location: device.DiaChi || device.ViTri || "Địa chỉ trống",
-            // temperature: device.NhietDo || "38°C",
-            // ram: device.RAM || "4GB",
-            // storage: device.BoNho || "32GB",
-            // code: device.MaThietBi || "",
-            // mac: device.MAC || "",
-          }));
-          setDeviceList(devices);
-        } else {
-          // If API fails, show error message
-          message.error("Không thể tải danh sách thiết bị");
-          setDeviceList([]);
-        }
-      })
-      .catch((error) => {
-        console.error("Error fetching device list:", error);
-        message.error("Lỗi khi tải danh sách thiết bị");
-        setDeviceList([]);
-      });
   };
 
-  const showDeviceDetailModal = (ManHinhID) => {
+  const showDeviceDetailModal = (deviceId) => {
     // In a real app, you would fetch device details here based on deviceId
     // For now, we'll use mock data that matches the selected device
     const selectedDevice =
-      deviceList.find((device) => device.ManHinhID === ManHinhID) ||
-      deviceList[0];
-    console.log(selectedDevice, "selectedDevice");
+      deviceList.find((device) => device.id === deviceId) || deviceList[0];
+
     const mockDevice = {
-      ...selectedDevice,
       name: selectedDevice?.name || "Go 1 - Màn hình 65",
       status: selectedDevice?.status || "active",
-      // location: selectedDevice?.location || "55 Tô Ngọc Vân, P12/Q3, Tp.HCM",
-      // code: "MH001",
-      // mac: "00:1B:44:11:3A:B7",
-      // temperature: selectedDevice?.temperature || "38°C",
-      // ram: selectedDevice?.ram || "4GB",
-      // storage: selectedDevice?.storage || "32GB",
+      location: selectedDevice?.location || "55 Tô Ngọc Vân, P12/Q3, Tp.HCM",
+      code: "MH001",
+      mac: "00:1B:44:11:3A:B7",
+      temperature: selectedDevice?.temperature || "38°C",
+      ram: selectedDevice?.ram || "4GB",
+      storage: selectedDevice?.storage || "32GB",
     };
 
     setDeviceDetail(mockDevice);
@@ -522,17 +414,7 @@ const DashBoard = (props) => {
     setScheduleDetail({
       title: `Lịch phát ngày ${date}`,
       date: date,
-      events: events.map((event) => ({
-        ...event,
-        // Include any additional processing needed for the modal
-        eventType:
-          event.eventData?.LoaiSuKien === 1
-            ? "Danh Sách Phát"
-            : event.eventData?.LoaiSuKien === 2
-            ? "Media"
-            : "Khác",
-        contentName: event.eventData?.TenMediaORDanhSachPhat || "",
-      })),
+      events: events,
     });
     setScheduleDetailModalVisible(true);
   };
@@ -543,18 +425,14 @@ const DashBoard = (props) => {
         <Box>
           <div className="dashboard-content">
             {/* Stats Overview - Responsive */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5 pt-2">
-              <div
-                className="bg-white rounded-lg p-5 flex items-center shadow-md hover:translate-y-[-5px] hover:shadow-lg transition duration-300 cursor-pointer"
-                onClick={() => showDeviceListModal("all")}
-              >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-5 ">
+              <div className="bg-white rounded-lg p-5 flex items-center shadow-md hover:translate-y-[-5px] hover:shadow-lg transition duration-300">
                 <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4 text-xl text-white bg-blue-500">
+                  {/* <i className="fas fa-desktop"></i> */}
                   <FaDesktop />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-semibold m-0 mb-1">
-                    {dataDB?.Tong || 0}
-                  </h3>
+                  <h3 className="text-2xl font-semibold m-0 mb-1">5</h3>
                   <p className="m-0 text-gray-600 text-sm">Tổng thiết bị</p>
                 </div>
               </div>
@@ -564,12 +442,11 @@ const DashBoard = (props) => {
                 onClick={() => showDeviceListModal("active")}
               >
                 <div className="w-[50px] h-[50px] rounded-full flex items-center justify-center mr-4 text-xl text-white bg-green-500">
+                  {/* <i className="fas fa-check-circle"></i> */}
                   <FaCheckCircle />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-semibold m-0 mb-1">
-                    {dataDB?.TongSoThietBiOnline || 0}
-                  </h3>
+                  <h3 className="text-2xl font-semibold m-0 mb-1">2</h3>
                   <p className="m-0 text-gray-600 text-sm">Đang hoạt động</p>
                 </div>
               </div>
@@ -582,9 +459,7 @@ const DashBoard = (props) => {
                   <FaPauseCircle />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-semibold m-0 mb-1">
-                    {dataDB?.TongSoThietBiOffline || 0}
-                  </h3>
+                  <h3 className="text-2xl font-semibold m-0 mb-1">2</h3>
                   <p className="m-0 text-gray-600 text-sm">Tạm dừng</p>
                 </div>
               </div>
@@ -597,9 +472,7 @@ const DashBoard = (props) => {
                   <FaTimesCircle />
                 </div>
                 <div>
-                  <h3 className="text-2xl font-semibold m-0 mb-1">
-                    {dataDB?.TongSoThietBiHetHan || 0}
-                  </h3>
+                  <h3 className="text-2xl font-semibold m-0 mb-1">1</h3>
                   <p className="m-0 text-gray-600 text-sm">Hết hạn</p>
                 </div>
               </div>
@@ -781,11 +654,11 @@ const DashBoard = (props) => {
             device={deviceDetail}
           />
 
-          {/* <ScheduleDetailModal
+          <ScheduleDetailModal
             visible={scheduleDetailModalVisible}
             onCancel={() => setScheduleDetailModalVisible(false)}
             schedule={scheduleDetail}
-          /> */}
+          />
         </Box>
       </LayoutWrapper>
     </>

@@ -478,10 +478,10 @@ html[dir="rtl"] .dz-hidden-input {
 }
 
 /* .center-modal__footer  */
-.ant-modal-footer button {
+/* .ant-modal-footer button {
   height: 30px !important;
   min-width: 100px !important;
-}
+} */
 
 .btn-danger {
   background: #d9001b !important;
