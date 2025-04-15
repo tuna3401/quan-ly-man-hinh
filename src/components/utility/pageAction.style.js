@@ -7,7 +7,7 @@ const WDComponentDivAction = styled.div`
   /* flex: 1; */
   padding: 0 3px 0 0;
   margin-bottom: 15px;
-
+  width: 100%;
   @media only screen and (max-width: 720px) {
     text-align: left;
     display: block;

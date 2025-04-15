@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Go Smart Signage</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="device-status.css">
+    <link rel="stylesheet" href="device-groups.css">
+    <link rel="stylesheet" href="calendar-schedule.css">
+    <link rel="stylesheet" href="dashboard.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo-container">
+                <img src="logo.png" alt="Go Smart Signage" class="logo">
+                <h2 class="logo-text">Go Smart Signage</h2>
+            </div>
+
+            <ul class="menu">
+                <li>
+                    <a href="#" class="menu-'item active">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-desktop"></i>
+                        <span>Thiết bị</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="#" class="submenu-item"><i class="fas fa-tv"></i> Màn hình</a></li>
+                        <li><a href="#" class="submenu-item"><i class="fas fa-object-group"></i> Nhóm màn hình</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-photo-video"></i>
+                        <span>Media</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-list"></i>
+                        <span>Danh sách phát</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" class="menu-item">
+                        <i class="fas fa-calendar-alt"></i>
+                        <span>Lịch phát</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="copyright">
+                <p>Copyright © 2025 GO SOLUTIONS.<br> All rights reserved.</p>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="header-left">
+                    <button class="menu-toggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <h1 class="page-title"><i class="fas fa-tachometer-alt"></i> Dashboard</h1>
+                </div>
+
+                <div class="header-right">
+                    <div class="notification">
+                        <i class="far fa-bell"></i>
+                        <span class="badge">2</span>
+                    </div>
+                    <div class="messages">
+                        <i class="far fa-envelope"></i>
+                        <span class="badge">10</span>
+                    </div>
+                    <div class="user-profile">
+                        <div class="user-info">
+                            <div class="user-name">AnhVH@gosol.com.vn</div>
+                            <div class="company-name">Go Solutions</div>
+                        </div>
+                        <div class="avatar">
+                            <span>Go</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Stats Overview -->
+                <div class="stats-overview">
+                    <div class="stat-card total">
+                        <div class="stat-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>5</h3>
+                            <p>Tổng thiết bị</p>
+                        </div>
+                    </div>
+                    <div class="stat-card active" data-status="active">
+                        <div class="stat-icon">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>2</h3>
+                            <p>Đang hoạt động</p>
+                        </div>
+                    </div>
+                    <div class="stat-card paused" data-status="paused">
+                        <div class="stat-icon">
+                            <i class="fas fa-pause-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>2</h3>
+                            <p>Tạm dừng</p>
+                        </div>
+                    </div>
+                    <div class="stat-card expired" data-status="expired">
+                        <div class="stat-icon">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>1</h3>
+                            <p>Hết hạn</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Section -->
+                <div class="charts-section">
+                    <!-- Device Status Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2>Trạng thái thiết bị</h2>
+                            <div class="chart-actions">
+                                <button class="chart-action-btn">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-container">
+                                <canvas id="deviceStatusChart"></canvas>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-item" data-status="active">
+                                    <span class="legend-color" style="background-color: #4CAF50;"></span>
+                                    <span class="legend-label">Hoạt động (2)</span>
+                                </div>
+                                <div class="legend-item" data-status="paused">
+                                    <span class="legend-color" style="background-color: #FF9800;"></span>
+                                    <span class="legend-label">Tạm dừng (2)</span>
+                                </div>
+                                <div class="legend-item" data-status="expired">
+                                    <span class="legend-color" style="background-color: #F44336;"></span>
+                                    <span class="legend-label">Hết hạn (1)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Device Groups Chart -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h2>Thiết bị theo nhóm</h2>
+                            <div class="chart-actions">
+                                <button class="chart-action-btn">
+                                    <i class="fas fa-ellipsis-v"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="chart-content">
+                            <div class="chart-container">
+                                <canvas id="deviceGroupsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Schedule Calendar -->
+                <div class="schedule-section">
+                    <div class="section-header">
+                        <h2>Lịch phát trong tháng</h2>
+                        <div class="month-selector">
+                            <button class="month-nav prev"><i class="fas fa-chevron-left"></i></button>
+                            <span class="current-month">Tháng 3, 2023</span>
+                            <button class="month-nav next"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                    </div>
+                    <div class="calendar-container">
+                        <div class="calendar-header">
+                            <div>CN</div>
+                            <div>T2</div>
+                            <div>T3</div>
+                            <div>T4</div>
+                            <div>T5</div>
+                            <div>T6</div>
+                            <div>T7</div>
+                        </div>
+                        <div class="calendar-grid" id="calendarGrid">
+                            <!-- Calendar days will be generated by JavaScript -->
+                        </div>
+                        <!-- Week event containers will be inserted here by JavaScript -->
+                        <div id="calendarEvents" class="calendar-events-container">
+                            <!-- Multi-day events will be rendered here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Device List Modal -->
+            <!-- For the device list modal -->
+            <div id="deviceListModal" class="modal">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 id="deviceListTitle"></h2>
+                  <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                  <div id="deviceListGrid" class="device-list-grid"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- For the device detail modal -->
+            <!-- Device Detail Modal -->
+            <div id="deviceDetailModal" class="modal">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 id="modalDeviceName"></h2>
+                  <button class="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                  <div class="device-detail-header">
+                    <div id="modalDeviceStatus" class="device-status-badge"></div>
+                  </div>
+                  
+                  <div class="device-location-detail">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span id="modalDeviceLocation"></span>
+                  </div>
+                  
+                  <div class="device-specs-detail">
+                    <h3>Thông tin thiết bị</h3>
+                    <div class="specs-grid-detail">
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-barcode"></i>
+                          <span>Mã thiết bị</span>
+                        </div>
+                        <div id="modalDeviceCode" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-network-wired"></i>
+                          <span>Địa chỉ MAC</span>
+                        </div>
+                        <div id="modalDeviceMAC" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-layer-group"></i>
+                          <span>Nhóm thiết bị</span>
+                        </div>
+                        <div id="modalDeviceGroup" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-bolt"></i>
+                          <span>Điện áp</span>
+                        </div>
+                        <div id="modalDeviceVoltage" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-plug"></i>
+                          <span>Công suất</span>
+                        </div>
+                        <div id="modalDevicePower" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-tachometer-alt"></i>
+                          <span>Dòng điện</span>
+                        </div>
+                        <div id="modalDeviceCurrent" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-thermometer-half"></i>
+                          <span>Nhiệt độ</span>
+                        </div>
+                        <div id="modalDeviceTemp" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-memory"></i>
+                          <span>RAM</span>
+                        </div>
+                        <div id="modalDeviceRAM" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-hdd"></i>
+                          <span>SSD</span>
+                        </div>
+                        <div id="modalDeviceSSD" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fab fa-android"></i>
+                          <span>Hệ điều hành</span>
+                        </div>
+                        <div id="modalDeviceOS" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-microchip"></i>
+                          <span>Vi xử lý</span>
+                        </div>
+                        <div id="modalDeviceProcessor" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-wifi"></i>
+                          <span>Kết nối</span>
+                        </div>
+                        <div id="modalDeviceNetwork" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-clock"></i>
+                          <span>Truy cập gần nhất</span>
+                        </div>
+                        <div id="modalDeviceLastOnline" class="spec-detail-value"></div>
+                      </div>
+                      <div class="spec-detail-item">
+                        <div class="spec-detail-label">
+                          <i class="fas fa-hourglass-half"></i>
+                          <span>Thời gian hoạt động</span>
+                        </div>
+                        <div id="modalDeviceUptime" class="spec-detail-value"></div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div id="deviceScreenshotContainer" class="device-screenshot-container">
+                    <!-- Screenshot will be inserted here -->
+                  </div>
+                  
+                  <div class="device-actions-detail">
+                    <button id="resumeDeviceBtn" class="action-btn-detail">
+                      <i class="fas fa-play"></i>
+                      <span>Mở lại thiết bị</span>
+                    </button>
+                    <button id="restartDeviceBtn" class="action-btn-detail">
+                      <i class="fas fa-redo"></i>
+                      <span>Khởi động lại</span>
+                    </button>
+                    <button id="shutdownDeviceBtn" class="action-btn-detail">
+                      <i class="fas fa-power-off"></i>
+                      <span>Tắt thiết bị</span>
+                    </button>
+                    <button id="captureDeviceBtn" class="action-btn-detail">
+                      <i class="fas fa-camera"></i>
+                      <span>Chụp màn hình</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- For the schedule detail modal -->
+            <div id="scheduleDetailModal" class="modal">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h2 id="scheduleDetailTitle"></h2>
+                  <button class="close-modal">&times;</button>
+                </div>
+                <!-- Rest of the modal content -->
+              </div>
+            </div>
+
+                <script src="dashboard.js"></script>
+            </body>
+
+            </html>

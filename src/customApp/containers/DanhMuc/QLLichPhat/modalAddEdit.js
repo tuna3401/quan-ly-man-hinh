@@ -1,11 +1,11 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from "react";
 import {
   ITEM_LAYOUT2,
   ITEM_LAYOUT,
   ITEM_LAYOUT_SMALL_2,
   REQUIRED,
-} from '../../../../settings/constants';
-import {Form, Space, Select, DatePicker, TimePicker, Row, Col} from 'antd';
+} from "../../../../settings/constants";
+import { Form, Space, Select, DatePicker, TimePicker, Row, Col } from "antd";
 import {
   Button,
   Modal,
@@ -13,27 +13,27 @@ import {
   Input,
   InputNumberFormat,
   Radio,
-} from '../../../../components/uielements/exportComponent';
+} from "../../../../components/uielements/exportComponent";
 import {
   BorderOutlined,
   CheckSquareOutlined,
   PlusOutlined,
   DeleteOutlined,
-} from '@ant-design/icons';
-import DatePickerFormat from '../../../../components/uielements/datePickerFormat';
+} from "@ant-design/icons";
+import DatePickerFormat from "../../../../components/uielements/datePickerFormat";
 // import DatePicker from '../../../../components/uielements/datePickerFormat';
-import {checkInputNumber} from '../../../../helpers/utility';
-import TextArea from 'antd/lib/input/TextArea';
-import moment from 'moment';
-import api from './config';
-import dayjs from 'dayjs';
+import { checkInputNumber } from "../../../../helpers/utility";
+import TextArea from "antd/lib/input/TextArea";
+import moment from "moment";
+import api from "./config";
+import dayjs from "dayjs";
 
 import {
   _debounce,
   getInfoFromToken,
   getLocalKey,
-} from '../../../../helpers/utility';
-const {Item, useForm} = Form;
+} from "../../../../helpers/utility";
+const { Item, useForm } = Form;
 
 export default (props) => {
   const [form] = useForm();
@@ -47,9 +47,9 @@ export default (props) => {
     DanhSachMediaOrPhat,
   } = props;
   const [DanhSachMenu, setDanhSachMenu] = useState([]);
-  const [fromTime, setFromTime] = useState('');
+  const [fromTime, setFromTime] = useState("");
   const [ChiaNgay, setChiaNgay] = useState(false);
-  const access_token1 = getLocalKey('access_token');
+  const access_token1 = getLocalKey("access_token");
   const dataUnzip1 = getInfoFromToken(access_token1);
   const ListNguoiDung = dataUnzip1?.NguoiDung?.NguoiDungID;
   const hideSelect = ListNguoiDung !== 18;
@@ -64,25 +64,25 @@ export default (props) => {
           id: index,
           DanhSachNgayPhat: dayjs(
             `${entry.DanhSachNgayPhat}T00:00:00`,
-            'YYYY/MM/DDTHH:mm:ss',
+            "YYYY/MM/DDTHH:mm:ss"
           ),
           GioBatDau: dayjs(
             `0000/01/01 ${entry.GioBatDau}`,
-            'YYYY/MM/DD HH:mm:ss',
+            "YYYY/MM/DD HH:mm:ss"
           ),
           GioKetThuc: dayjs(
             `0000/01/01 ${entry.GioKetThuc}`,
-            'YYYY/MM/DD HH:mm:ss',
+            "YYYY/MM/DD HH:mm:ss"
           ),
-        }),
+        })
       );
       setRows(newRows);
       setSelectedLoaiSuKien(LoaiSuKienValue);
       const ListManHinhOrNhomManHinhs = dataEdit.ListManHinhOrNhomManHinh;
       const fieldsValue = {
         ...dataEdit,
-        ListManHinhOrNhomManHinh: ListManHinhOrNhomManHinhs.map(
-          (item) => item.ID,
+        ListManHinhOrNhomManHinh: ListManHinhOrNhomManHinhs?.map(
+          (item) => item.ID
         ),
       };
       newRows.forEach((row) => {
@@ -103,7 +103,7 @@ export default (props) => {
   const handleGetManHinhOrNhomManHinh = async () => {
     try {
       const res = await api.danhSachManHinhOrNhomManHinh({
-        coQuanID: form.getFieldValue('CoQuanID'),
+        coQuanID: form.getFieldValue("CoQuanID"),
       });
       if (res.data.Status > 0) {
         setDanhSachManHinhOrNhomManHinh(res.data.Data);
@@ -113,11 +113,11 @@ export default (props) => {
       }
     } catch (error) {
       message.destroy();
-      message.error('An error occurred while fetching data');
+      message.error("An error occurred while fetching data");
     } finally {
     }
   };
-  const access_token = getLocalKey('access_token');
+  const access_token = getLocalKey("access_token");
   const dataUnzip = getInfoFromToken(access_token);
   const ListChucNang = dataUnzip?.NguoiDung?.CoQuanID;
   useEffect(() => {
@@ -130,7 +130,7 @@ export default (props) => {
         setDanhSachMenu(res.data.Data);
       }
     } catch (error) {
-      console.error('Lỗi khi lấy danh sách cấp xếp hạng:', error);
+      console.error("Lỗi khi lấy danh sách cấp xếp hạng:", error);
     }
   };
   const onOk = async (e) => {
@@ -140,7 +140,7 @@ export default (props) => {
 
       const transformedList = values.ListManHinhOrNhomManHinh?.map((id) => {
         const selectedItem = DanhSachManHinhOrNhomManHinh.find(
-          (item) => item.ID === id,
+          (item) => item.ID === id
         );
         return {
           ID: selectedItem.ID,
@@ -150,7 +150,7 @@ export default (props) => {
       });
 
       const selectedMediaOrPlaylist = danhSachMauPhieuSuggest.find(
-        (item) => item.ID === values.MediaORDanhSachPhat,
+        (item) => item.ID === values.MediaORDanhSachPhat
       );
 
       const payload = {
@@ -162,10 +162,10 @@ export default (props) => {
       if (ChiaNgay) {
         const DanhSachNgayPhat = rows.map((row) => ({
           DanhSachNgayPhat: [
-            values[`NgayPhat_${row.id}`]?.format('YYYY-MM-DDTHH:mm:ss'),
+            values[`NgayPhat_${row.id}`]?.format("YYYY-MM-DDTHH:mm:ss"),
           ],
-          GioBatDau: values[`GioBatDau_${row.id}`]?.format('HH:mm:ss'),
-          GioKetThuc: values[`GioKetThuc_${row.id}`]?.format('HH:mm:ss'),
+          GioBatDau: values[`GioBatDau_${row.id}`]?.format("HH:mm:ss"),
+          GioKetThuc: values[`GioKetThuc_${row.id}`]?.format("HH:mm:ss"),
         }));
 
         payload.DanhSachNgayPhat = DanhSachNgayPhat;
@@ -179,10 +179,10 @@ export default (props) => {
       } else {
         payload.DanhSachNgayPhat = [];
       }
-
+      console.log("submitValue");
       props.onCreate(payload);
     } catch (errorInfo) {
-      console.error('Validation failed:', errorInfo);
+      console.error("Validation failed:", errorInfo);
     }
   };
 
@@ -198,7 +198,7 @@ export default (props) => {
     try {
       const res = await api.danhSachMediaorPhat({
         title: LoaiSuKien,
-        coQuanID: form.getFieldValue('CoQuanID'),
+        coQuanID: form.getFieldValue("CoQuanID"),
       });
       if (res.data.Status > 0) {
         setDanhSachMauPhieuSuggest(res.data.Data);
@@ -208,14 +208,14 @@ export default (props) => {
       }
     } catch (error) {
       message.destroy();
-      message.error('An error occurred while fetching data');
+      message.error("An error occurred while fetching data");
     } finally {
     }
   };
 
   const [rows, setRows] = useState([{}]);
   const addRow = () => {
-    setRows([...rows, {id: Date.now()}]);
+    setRows([...rows, { id: Date.now() }]);
   };
 
   const removeRow = (id) => {
@@ -223,7 +223,7 @@ export default (props) => {
   };
   return (
     <Modal
-      title={`${action === 'edit' ? 'Sửa' : 'Thêm mới'} lịch phát`}
+      title={`${action === "edit" ? "Sửa" : "Thêm mới"} lịch phát`}
       width={750}
       visible={visible}
       onCancel={props.onCancel}
@@ -244,23 +244,23 @@ export default (props) => {
         </Button>,
       ]}
     >
-      <Form form={form} name={'formDiSanTuLieu'}>
-        {action !== 'add' ? (
+      <Form form={form} name={"formDiSanTuLieu"}>
+        {action !== "add" ? (
           <Item name="LichPhatID" hidden {...REQUIRED}></Item>
         ) : null}
         {/* <Item name="CoQuanID" hidden {...REQUIRED}></Item> */}
         {!hideSelect && (
           <Item
             label="Chọn khách hàng"
-            name={'CoQuanID'}
+            name={"CoQuanID"}
             {...ITEM_LAYOUT}
             rules={[REQUIRED]}
           >
             <Select
               allowClear
               onChange={(value) => {
-                form.setFieldsValue({MediaORDanhSachPhat: undefined});
-                form.setFieldsValue({ListManHinhOrNhomManHinh: undefined}); // Clear Media/Danh sách phát
+                form.setFieldsValue({ MediaORDanhSachPhat: undefined });
+                form.setFieldsValue({ ListManHinhOrNhomManHinh: undefined }); // Clear Media/Danh sách phát
                 handleGetListSuggest(selectedLoaiSuKien); // Call handleGetListSuggest with the current selectedLoaiSuKien
                 handleGetManHinhOrNhomManHinh(); // Call handleGetManHinhOrNhomManHinh when a value is selected
               }}
@@ -272,12 +272,12 @@ export default (props) => {
             </Select>
           </Item>
         )}
-        <Item label="Tên danh sách phát" name={'TenLichPhat'} {...ITEM_LAYOUT}>
+        <Item label="Tên danh sách phát" name={"TenLichPhat"} {...ITEM_LAYOUT}>
           <Input />
         </Item>
         <Item
           label="Loại thư viện"
-          name={'LoaiSuKien'}
+          name={"LoaiSuKien"}
           {...ITEM_LAYOUT}
           rules={[REQUIRED]}
         >
@@ -285,7 +285,7 @@ export default (props) => {
             allowClear
             onChange={(value) => {
               setSelectedLoaiSuKien(value);
-              form.setFieldsValue({MediaORDanhSachPhat: undefined}); // Clear Media/Danh sách phát
+              form.setFieldsValue({ MediaORDanhSachPhat: undefined }); // Clear Media/Danh sách phát
             }}
             // style={{width: '200px'}}
           >
@@ -296,7 +296,7 @@ export default (props) => {
         </Item>
         <Item
           label="Media/Danh sách phát"
-          name={'MediaORDanhSachPhat'}
+          name={"MediaORDanhSachPhat"}
           {...ITEM_LAYOUT}
           rules={[REQUIRED]}
         >
@@ -311,7 +311,7 @@ export default (props) => {
         </Item>
         <Item
           label="Màn hình/Nhóm màn hình "
-          name={'ListManHinhOrNhomManHinh'}
+          name={"ListManHinhOrNhomManHinh"}
           {...ITEM_LAYOUT}
           rules={[REQUIRED]}
         >
@@ -327,7 +327,7 @@ export default (props) => {
         </Item>
         <Item
           label="Chia ngày"
-          name={'ChiaNgay'}
+          name={"ChiaNgay"}
           {...ITEM_LAYOUT}
           rules={[REQUIRED]}
         >
@@ -350,7 +350,7 @@ export default (props) => {
                     <DatePicker
                       format="DD/MM/YYYY"
                       placeholder=""
-                      style={{width: '100%'}}
+                      style={{ width: "100%" }}
                     />
                   </Item>
                 </Col>
@@ -377,7 +377,7 @@ export default (props) => {
                 <Col span={1}>
                   <DeleteOutlined
                     onClick={() => removeRow(row.id)}
-                    style={{marginTop: '10px'}}
+                    style={{ marginTop: "10px" }}
                   />
                 </Col>
               </Row>
@@ -385,7 +385,7 @@ export default (props) => {
             <Button
               type="dashed"
               onClick={addRow}
-              style={{width: '100%', marginBottom: 16}}
+              style={{ width: "100%", marginBottom: 16 }}
             >
               <PlusOutlined /> Thêm mốc thời gian mới
             </Button>
@@ -394,7 +394,7 @@ export default (props) => {
 
         <Item
           label="Thứ tự hiển thị"
-          name={'ThuTu'}
+          name={"ThuTu"}
           {...ITEM_LAYOUT}
           rules={[REQUIRED]}
         >
@@ -402,7 +402,7 @@ export default (props) => {
         </Item>
         <Item
           label="Trạng thái"
-          name={'TrangThai'}
+          name={"TrangThai"}
           {...ITEM_LAYOUT}
           rules={[REQUIRED]}
         >

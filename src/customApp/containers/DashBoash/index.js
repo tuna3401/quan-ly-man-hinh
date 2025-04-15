@@ -229,23 +229,29 @@ const DashBoard = (props) => {
           if (event.CreatedDate && event.EndDate) {
             const startDate = new Date(event.CreatedDate);
             const endDate = new Date(event.EndDate);
-            
+
             // Current month's date range
             const currentMonthStart = new Date(year, month, 1);
             const currentMonthEnd = new Date(year, month + 1, 0);
-            
+
             // Check if event period overlaps with current month
             if (startDate <= currentMonthEnd && endDate >= currentMonthStart) {
               // Calculate the range of days to display the event in current month
-              const rangeStart = startDate > currentMonthStart ? startDate : currentMonthStart;
-              const rangeEnd = endDate < currentMonthEnd ? endDate : currentMonthEnd;
-              
+              const rangeStart =
+                startDate > currentMonthStart ? startDate : currentMonthStart;
+              const rangeEnd =
+                endDate < currentMonthEnd ? endDate : currentMonthEnd;
+
               // Add event to all days in the range
-              for (let date = new Date(rangeStart); date <= rangeEnd; date.setDate(date.getDate() + 1)) {
+              for (
+                let date = new Date(rangeStart);
+                date <= rangeEnd;
+                date.setDate(date.getDate() + 1)
+              ) {
                 if (date.getMonth() === month && date.getFullYear() === year) {
                   const day = date.getDate();
                   const dayIndex = day + startingDay - 1;
-                  
+
                   if (
                     dayIndex >= 0 &&
                     dayIndex < days.length &&
@@ -775,11 +781,11 @@ const DashBoard = (props) => {
             device={deviceDetail}
           />
 
-          <ScheduleDetailModal
+          {/* <ScheduleDetailModal
             visible={scheduleDetailModalVisible}
             onCancel={() => setScheduleDetailModalVisible(false)}
             schedule={scheduleDetail}
-          />
+          /> */}
         </Box>
       </LayoutWrapper>
     </>

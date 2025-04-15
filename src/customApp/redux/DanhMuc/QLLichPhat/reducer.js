@@ -1,57 +1,58 @@
-import actions from './actions';
+import actions from "./actions";
 
 const initState = {
-  role: {view: 0, add: 0, edit: 0, delete: 0},
-  DanhSachNgheNhan: [],
-  DanhSachLoaiSuKien:[],
-  DanhSachMediaOrPhat:[],
-  DanhSachManHinhOrNhomManHinh:[],
+  role: { view: 0, add: 0, edit: 0, delete: 0 },
+  dataSchedulePlayList: {},
+  DanhSachLoaiSuKien: [],
+  DanhSachMediaOrPhat: [],
+  DanhSachManHinhOrNhomManHinh: [],
   TotalRow: 0,
-  TableLoading: false,
+  loading: false,
 };
 
 export default function Reducer(state = initState, action) {
-  const {type, payload} = action;
+  const { type, payload } = action;
   switch (type) {
-     //get initData
-     case actions.NGHENHAN_GET_INIT_DATA_REQUEST:
+    //get initData
+    case actions.SCHEDULEPLAYLIST_GET_INIT_DATA_REQUEST:
       return {
         ...state,
       };
-    case actions.NGHENHAN_GET_INIT_DATA_REQUEST_SUCCESS:
+    case actions.SCHEDULEPLAYLIST_GET_INIT_DATA_REQUEST_SUCCESS:
+      console.log(payload, "payload");
       return {
         ...state,
         DanhSachLoaiSuKien: payload.DanhSachLoaiSuKien,
         DanhSachMediaOrPhat: payload.DanhSachMediaOrPhat,
         DanhSachManHinhOrNhomManHinh: payload.DanhSachManHinhOrNhomManHinh,
       };
-    case actions.NGHENHAN_GET_INIT_DATA_REQUEST_ERROR:
+    case actions.SCHEDULEPLAYLIST_GET_INIT_DATA_REQUEST_ERROR:
       return {
         ...state,
         DanhSachLoaiSuKien: [],
         DanhSachMediaOrPhat: [],
-        DanhSachManHinhOrNhomManHinh:[],
+        DanhSachManHinhOrNhomManHinh: [],
       };
     //get list
-    case actions.NGHENHAN_GET_LIST_REQUEST:
+    case actions.SCHEDULEPLAYLIST_GET_LIST_REQUEST:
       return {
         ...state,
-        TableLoading: true,
+        loading: true,
       };
-    case actions.NGHENHAN_GET_LIST_REQUEST_SUCCESS:
+    case actions.SCHEDULEPLAYLIST_GET_LIST_REQUEST_SUCCESS:
       return {
         ...state,
-        DanhSachNgheNhan: payload.DanhSachNgheNhan,
+        dataSchedulePlayList: payload.dataSchedulePlayList,
         // AllHuongDan: payload.AllHuongDan,
         TotalRow: payload.TotalRow,
-        TableLoading: false,
+        loading: false,
       };
-    case actions.NGHENHAN_GET_LIST_REQUEST_ERROR:
+    case actions.SCHEDULEPLAYLIST_GET_LIST_REQUEST_ERROR:
       return {
         ...state,
-        DanhSachNgheNhan: [],
+        dataSchedulePlayList: {},
         TotalRow: 0,
-        TableLoading: false,
+        loading: false,
       };
     default:
       return state;
