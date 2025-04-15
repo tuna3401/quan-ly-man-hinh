@@ -77,7 +77,7 @@ const TopbarDropdownWrapper = styled.div`
       h5 {
         font-size: 14px;
         font-weight: 500;
-        font-family: "Poppins", sans-serif;
+        font-family: 'Poppins', sans-serif !important;
         color: ${palette('text', 0)};
         margin-top: 0;
       }

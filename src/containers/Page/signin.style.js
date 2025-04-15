@@ -14,13 +14,13 @@ const SignInStyleWrapper = styled.div`
   background: url(${bgImage}) no-repeat center center;
   background-size: cover;
   overflow: hidden;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif !important;
   
   html h1, html h2, html h3, html h4, html h5, html h6, a, p, html li, input, textarea, span, div, html, body, html a {
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif !important;
   }
   h1, h2, h3, h4, h5, h6, button{
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     font-weight: 600 !important;
   }
   
@@ -136,7 +136,7 @@ const SignInStyleWrapper = styled.div`
       flex-direction: column;
       .divMessage {
         font-size: 20px;
-        font-family: "Poppins", sans-serif;
+        font-family: 'Poppins', sans-serif !important;
         color: green;
         padding: 0 20px;
         width: 100%;
@@ -235,7 +235,7 @@ const SignInStyleWrapper = styled.div`
     text-align: center;
     color: darkgrey;
     font-size: 12px;
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif !important;
   }
 `;
 

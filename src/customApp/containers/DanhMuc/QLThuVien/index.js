@@ -280,6 +280,7 @@ const QLThuVien = (props) => {
                   overflow: "hidden",
                   boxShadow: "0 2px 8px rgba(0,0,0,0.09)",
                   minWidth: "300px",
+                  maxWidth: "330px",
                   transition: "all 0.3s ease",
                   cursor: "pointer",
                   background: "#fff",

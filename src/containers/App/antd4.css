@@ -613,7 +613,7 @@
   margin-right: 4px;
   color: #ff4d4f;
   font-size: 14px;
-  font-family: "Poppins", sans-serif;
+  font-family: 'Poppins', sans-serif !important;
   line-height: 1;
   content: '*';
 }

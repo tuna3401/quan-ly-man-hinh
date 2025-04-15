@@ -338,6 +338,13 @@ const Topbar = (props) => {
   const access_token1 = getLocalKey("access_token");
   const dataUnzip1 = getInfoFromToken(access_token1);
   const TenNguoiDung = dataUnzip1?.NguoiDung?.TenNguoiDung;
+  const [width, setWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWidth(window.innerWidth);
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
   return (
     <TopbarWrapper style={{ userSelect: "none" }} SidebarWidth={SidebarWidth}>
       <Header
@@ -349,7 +356,7 @@ const Topbar = (props) => {
         }}
       >
         <div className="isoLeft">
-          {/* <MenuOutlined
+          <MenuOutlined
             className={
               collapsed ? "triggerBtn menuCollapsed" : "triggerBtn menuOpen"
             }
@@ -357,7 +364,7 @@ const Topbar = (props) => {
               toggleCollapsed();
               // handleGetListChild();
             }}
-          /> */}
+          />
           {/* <Link
             to={"/dashboard"}
             style={{ display: "flex", fontSize: 18,marginTop:"15px" }}
@@ -368,7 +375,7 @@ const Topbar = (props) => {
             }}
           > */}
 
-          <h1 className={"triggerHeader"}>{document.title}</h1>
+          {width > 500 && <h1 className={"triggerHeader"}>{document.title}</h1>}
         </div>
         {/* <Menu
             onClick={handleClick}

@@ -2,9 +2,9 @@ import styled from "styled-components";
 import { palette } from "styled-theme";
 import { transition, borderRadius } from "../../settings/style-util";
 
-const widthCollaped = "50px";
+const widthCollaped = "80px";
 const widthCollapedMobile = "0px";
-const widthExpanded = "280px";
+const widthExpanded = "320px";
 
 const SidebarWrapper = styled.div`
   .triggerHeader {
@@ -122,8 +122,7 @@ const SidebarWrapper = styled.div`
 
     .isoDashboardMenu {
       border-top: 1px solid #f0f0f0;
-      padding: 20px 10px;
-      padding-bottom: 35px;
+      padding: 20px 40px 35px 20px;
       border-inline-end: none !important;
       background: transparent;
       /* margin-top: 70px; */
@@ -344,9 +343,12 @@ const SidebarWrapper = styled.div`
 
     &.ant-layout-sider-collapsed {
       .nav-text {
+        /* display: none; */
+        border-left: 3px solid #ff6b00 !important;
+      }
+      .ant-menu-submenu-arrow {
         display: none;
       }
-
       .ant-menu-submenu-inline > {
         .ant-menu-submenu-title:after {
           display: none;

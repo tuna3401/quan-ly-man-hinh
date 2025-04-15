@@ -139,7 +139,7 @@ export const ContentModal = styled.div`
     justify-content: space-between;
   }
   .conten-group-left-text {
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     font-size: 16px;
     font-weight: 400;
     line-height: 24px;

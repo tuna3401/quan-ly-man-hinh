@@ -127,7 +127,7 @@ theme.palette = {
 };
 
 theme.fonts = {
-  primary: "Roboto, sans-serif",
+  primary: "Poppins, sans-serif",
   pre: "Consolas, Liberation Mono, Menlo, Courier, monospace",
 };
 

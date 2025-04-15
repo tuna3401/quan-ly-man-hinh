@@ -366,7 +366,7 @@ export default styled.div`
       text-align: center;
       align-items: center;
       justify-content: center;
-      font-family: "Poppins", sans-serif;
+      font-family: 'Poppins', sans-serif !important;
       font-weight: 400;
       font-style: normal;
       font-size: 16px;

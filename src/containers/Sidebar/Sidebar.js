@@ -13,6 +13,7 @@ import { useSelector } from "react-redux";
 import { useDispatch } from "react-redux";
 import { Redirect, useHistory } from "react-router-dom";
 import { MenuOutlined } from "@ant-design/icons";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 import Go from "./go.png";
 const SubMenu = Menu.SubMenu;
 const { Sider } = Layout;
@@ -243,8 +244,7 @@ const Sidebar = (props) => {
   };
 
   const { toggleOpenDrawer, customizedTheme, height } = props;
-  const collapsed = clone(app.collapsed) && !clone(app.openDrawer);
-  console.log(collapsed);
+  const collapsed = clone(app.collapsed);
   const { openDrawer } = app;
   const mode = collapsed === true ? "vertical" : "inline";
   const onMouseEnter = () => {
@@ -281,7 +281,8 @@ const Sidebar = (props) => {
       history.push(`${url}/${MaRedirect}`);
     }
   }, [MaRedirect]);
-
+  const [isHovered, setIsHovered] = useState(false);
+  console.log("isHovered", isHovered);
   return (
     <>
       {/* {width <= 500 ?  */}
@@ -299,8 +300,14 @@ const Sidebar = (props) => {
           collapsed={collapsed}
           width={220}
           className="isomorphicSidebar"
-          onMouseEnter={onMouseEnter}
-          onMouseLeave={onMouseLeave}
+          onMouseEnter={() => {
+            onMouseEnter();
+            setIsHovered(true);
+          }}
+          onMouseLeave={() => {
+            onMouseLeave();
+            setIsHovered(false);
+          }}
         >
           <div
             style={{
@@ -310,17 +317,6 @@ const Sidebar = (props) => {
               overflowX: "hidden",
             }}
           >
-            <MenuOutlined
-              style={{
-                fontSize: "20px",
-                margin: "10px",
-                cursor: "pointer",
-              }}
-              onClick={() => {
-                props.toggleCollapsed();
-                props.toggleOpenDrawer();
-              }}
-            />
             <img
               src={Go}
               alt={""}
@@ -334,26 +330,49 @@ const Sidebar = (props) => {
 
             <h2
               className={"triggerHeader"}
-              style={{ display: collapsed ? "none" : "block" }}
+              // style={{ display: collapsed ? "none" : "block" }}
             >
-              Go Smart Signage
+              {!collapsed ? "Go Smart Signage" : ""}
             </h2>
-            <Menu
-              onClick={handleClick}
-              theme="light"
-              className="isoDashboardMenu"
-              mode={mode}
-              openKeys={collapsed ? [] : app.openKeys}
-              selectedKeys={app.current}
-              onOpenChange={onOpenChange}
-            >
-              {listOptions.map((singleOption) =>
-                getMenuItem({ submenuStyle, submenuColor, singleOption })
-              )}
-            </Menu>
+            <div style={{ display: "flex", justifyContent: "space-between" }}>
+              <Menu
+                onClick={handleClick}
+                theme="light"
+                className="isoDashboardMenu"
+                mode={mode}
+                openKeys={collapsed ? [] : app.openKeys}
+                selectedKeys={app.current}
+                onOpenChange={onOpenChange}
+              >
+                {listOptions.map((singleOption) =>
+                  getMenuItem({ submenuStyle, submenuColor, singleOption })
+                )}
+              </Menu>
+              <i
+                className={`fas ${collapsed ? 'fa-chevron-right' : 'fa-chevron-left'}`}
+                style={{
+                  fontSize: "20px",
+                  margin: "10px",
+                  cursor: "pointer",
+                  opacity: isHovered ? 1 : 0,
+                  transition: "opacity 0.3s ease",
+                  position: "absolute",
+                  right: "0",
+                  top: "50%",
+                  color: "#1890ff",
+                }}
+                onClick={() => {
+                  props.toggleCollapsed();
+                  props.toggleOpenDrawer();
+                }}
+              />
+            </div>
           </div>
+         
         </Sider>
+        
       </SidebarWrapper>
+      
     </>
   );
 };

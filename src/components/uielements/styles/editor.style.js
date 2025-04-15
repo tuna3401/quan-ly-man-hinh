@@ -31,7 +31,7 @@ const QuillEditor = styled.div`
   }
 
   .ql-container {
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     min-height: 220px;
   }
 

@@ -40,7 +40,7 @@ const Badge = styled(AntBadge)`
       props["data-rtl"] === "rtl" ? "translateX(50%)" : "translateX(-50%)"};
     z-index: 1;
     background: ${palette("primary", 0)};
-    font-family: "Poppins", sans-serif;
+    font-family: 'Poppins', sans-serif !important;
     ${boxShadow("0 0 0 1px #fff")};
   }
   .ant-badge-status-text {

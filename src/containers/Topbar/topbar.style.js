@@ -137,11 +137,11 @@ const TopbarWrapper = styled.div`
       .triggerHeader {
         font-size: 18px;
         font-weight: 600;
-        color: #333;
+        color:rgb(71, 68, 68);
         display: flex;
         align-items: center;
         box-sizing: border-box;
-        font-family: "Poppins", sans-serif;
+        font-family: 'Poppins', sans-serif;
       }
 
       img {
@@ -153,7 +153,7 @@ const TopbarWrapper = styled.div`
       .triggerBtn {
         width: ${(props) =>
           props?.SidebarWidth ? `${props.SidebarWidth}px` : "24px"};
-        height: 100%;
+        /* height: 100%; */
         align-items: center;
         justify-content: center;
         //background-color: ${palette("primary", 16)};

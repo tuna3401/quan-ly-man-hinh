@@ -1,5 +1,6 @@
 @font-face {
-  font-family: "Glyphicons Halflings";
+    font-family: 'Poppins', sans-serif !important;
+
   src: url("https://netdna.bootstrapcdn.com/bootstrap/3.0.0/fonts/glyphicons-halflings-regular.eot");
   src: url("https://netdna.bootstrapcdn.com/bootstrap/3.0.0/fonts/glyphicons-halflings-regular.eot?#iefix")
       format("embedded-opentype"),
@@ -14,7 +15,8 @@
   position: relative;
   top: 1px;
   display: inline-block;
-  font-family: "Glyphicons Halflings";
+    font-family: 'Poppins', sans-serif !important;
+
   font-style: normal;
   font-weight: normal;
   line-height: 1;
@@ -1173,7 +1175,7 @@ body .container.body .right_col {
 body {
   color: #73879c;
   background: #2a3f54;
-  font-family: "Helvetica Neue", Roboto, Arial, "Droid Sans", sans-serif;
+  font-family: 'Poppins', sans-serif !important;
   font-size: 13px;
   font-weight: 400;
   line-height: 1.471;
@@ -2526,7 +2528,8 @@ h4.graph_title {
   width: 26px;
   opacity: 0.99;
   display: inline-block;
-  font-family: FontAwesome;
+  font-family: 'Poppins', sans-serif !important;
+
   font-style: normal;
   font-weight: normal;
   font-size: 18px;
@@ -3218,7 +3221,8 @@ span.tag {
   margin-right: 5px;
   font-weight: 500;
   margin-bottom: 5px;
-  font-family: helvetica;
+  font-family: 'Poppins', sans-serif !important;
+
 }
 span.tag a {
   color: #f1f6f7 !important;
@@ -3232,7 +3236,8 @@ span.tag a {
 .tagsinput input {
   width: 80px;
   margin: 0px;
-  font-family: helvetica;
+  font-family: 'Poppins', sans-serif !important;
+
   font-size: 13px;
   border: 1px solid transparent;
   padding: 3px;
@@ -3891,7 +3896,8 @@ ul.project_files li a i {
   padding: 0 4px;
 }
 .view p {
-  font-family: Georgia, serif;
+  font-family: 'Poppins', sans-serif !important;
+
   font-style: italic;
   font-size: 12px;
   position: relative;
@@ -4051,7 +4057,8 @@ ul.project_files li a i {
   color: #666;
   background: rgba(243, 242, 243, 0.8);
   border: solid 2px rgba(195, 194, 196, 0.8);
-  font-family: sans-serif;
+  font-family: 'Poppins', sans-serif !important;
+
   font-size: 12px;
   text-align: center;
 }

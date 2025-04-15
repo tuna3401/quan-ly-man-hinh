@@ -47,6 +47,7 @@ import {
   getInfoFromToken,
   getLocalKey,
 } from "../../../../helpers/utility";
+import '@fortawesome/fontawesome-free/css/all.min.css';
 const { TreeNode } = Tree;
 const DMChiTieu = (props) => {
   document.title = "Quản Lý Media";
@@ -914,7 +915,7 @@ const DMChiTieu = (props) => {
                         }}
                         onClick={() => showModalEditEdit(item.ID)}
                       >
-                        <EditOutlined />
+                        <i className="fas fa-edit" />
                       </div>
                     </Tooltip>
                     <Tooltip color="#ff4d4f" title={"Xóa"}>
@@ -941,7 +942,7 @@ const DMChiTieu = (props) => {
                         }}
                         onClick={() => deleteModalAddEdit(item.ID)}
                       >
-                        <DeleteOutlined />
+                        <i className="fas fa-trash" />
                       </div>
                     </Tooltip>
                   </div>

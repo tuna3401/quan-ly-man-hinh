@@ -128,7 +128,7 @@ export default styled.div`
         .title {
           font-size: var(--title);
           margin-bottom: 51px;
-          font-family: "Poppins", sans-serif;
+          font-family: 'Poppins', sans-serif !important;
           text-transform: uppercase;
         }
       }
