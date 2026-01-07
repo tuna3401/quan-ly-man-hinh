@@ -97,6 +97,10 @@ const DashBoard = (props) => {
     activeTab: "0",
   });
 
+  // Pagination for sidebar
+  const [sidebarPage, setSidebarPage] = useState(1);
+  const [sidebarPageSize] = useState(5);
+
   useEffect(() => {
     changeUrlFilter(filterData);
     dispatch(actions.getList(filterData));
@@ -304,9 +308,8 @@ const DashBoard = (props) => {
               ) {
                 days[dayIndex].events.push({
                   title: event.TenLichPhat,
-                  time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${
-                    event.GioKetThuc?.substring(0, 5) || "23:59"
-                  }`,
+                  time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${event.GioKetThuc?.substring(0, 5) || "23:59"
+                    }`,
                   color: color,
                   eventData: event, // Store full event data for modal
                 });
@@ -348,9 +351,8 @@ const DashBoard = (props) => {
                   ) {
                     days[dayIndex].events.push({
                       title: event.TenLichPhat,
-                      time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${
-                        event.GioKetThuc?.substring(0, 5) || "23:59"
-                      }`,
+                      time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${event.GioKetThuc?.substring(0, 5) || "23:59"
+                        }`,
                       color: color,
                       eventData: event, // Store full event data for modal
                     });
@@ -413,8 +415,8 @@ const DashBoard = (props) => {
           event.eventData?.LoaiSuKien === 1
             ? "Danh Sách Phát"
             : event.eventData?.LoaiSuKien === 2
-            ? "Media"
-            : "Khác",
+              ? "Media"
+              : "Khác",
         contentName: event.eventData?.TenMediaORDanhSachPhat || "",
       })),
     });
@@ -534,16 +536,16 @@ const DashBoard = (props) => {
                 // Get device count
                 const deviceCount =
                   item.ListManHinhOrNhomManHinh &&
-                  item.ListManHinhOrNhomManHinh.length > 0
+                    item.ListManHinhOrNhomManHinh.length > 0
                     ? item.ListManHinhOrNhomManHinh.filter(
-                        (device) => device.Ten !== null
-                      ).length
+                      (device) => device.Ten !== null
+                    ).length
                     : 0;
                 console.log(activeTab === "1", 'activeTab === "1"');
                 return (
                   activeTab === "1" && (
                     <div
-                      key={index}
+                      key={item.LichPhatID || `schedule-${index}`}
                       className="bg-white rounded-sm shadow-sm overflow-hidden border-l-4"
                       style={{ borderLeftColor: eventColor }}
                     >
@@ -590,8 +592,11 @@ const DashBoard = (props) => {
                           </div>
                         </div>
                         <div className="flex items-center">
-                          <span className="text-sm text-gray-500 mr-2">
-                            Đã kết thúc
+                          <span
+                            className={`text-sm mr-2 font-medium ${item.TrangThai ? "text-green-500" : "text-red-500"
+                              }`}
+                          >
+                            {item.TrangThai ? "Hoạt động" : "Tạm dừng"}
                           </span>
                           <div className="flex gap-2">
                             <Tooltip title={"Sửa"}>
@@ -643,7 +648,6 @@ const DashBoard = (props) => {
                 PageSize: pageSize,
               };
               setFilterData(newFilterData);
-              props.getList(newFilterData);
             }}
           />
         </div>
@@ -693,100 +697,239 @@ const DashBoard = (props) => {
 
   // Render calendar view
   const renderCalendarView = () => {
+    // Filter schedules for current month
+    const monthMatch = currentMonth.match(/Tháng (\d+), (\d+)/);
+    const monthlySchedules = [];
+
+    if (monthMatch && Array.isArray(dataSchedulePlayList)) {
+      const month = parseInt(monthMatch[1], 10) - 1;
+      const year = parseInt(monthMatch[2], 10);
+
+      console.log('Filtering for month:', month + 1, 'year:', year);
+      console.log('Total schedules:', dataSchedulePlayList.length);
+
+      dataSchedulePlayList.forEach((event, index) => {
+        let shouldInclude = false;
+        let displayDate = '';
+
+        // Debug: Log first event to see structure
+        if (index === 0) {
+          console.log('Sample event structure:', {
+            TenLichPhat: event.TenLichPhat,
+            DanhSachNgayPhats: event.DanhSachNgayPhats,
+            ChiaNgay: event.ChiaNgay,
+            allFields: Object.keys(event)
+          });
+        }
+
+        // Check if this is an "always-on" schedule (Luôn Luôn)
+        // These schedules have empty or no DanhSachNgayPhats array
+        if (!event.DanhSachNgayPhats || event.DanhSachNgayPhats.length === 0) {
+          shouldInclude = true;
+          displayDate = 'Luôn luôn';
+          console.log('Always-on schedule:', event.TenLichPhat);
+        }
+        // Check DanhSachNgayPhats array for dates in current month
+        else if (Array.isArray(event.DanhSachNgayPhats)) {
+          event.DanhSachNgayPhats.forEach((ngayPhat) => {
+            const eventDate = new Date(ngayPhat.DanhSachNgayPhat);
+            console.log('Checking date:', event.TenLichPhat, ngayPhat.DanhSachNgayPhat, 'Month:', eventDate.getMonth() + 1, 'Year:', eventDate.getFullYear());
+
+            if (eventDate.getMonth() === month && eventDate.getFullYear() === year) {
+              shouldInclude = true;
+              displayDate = dayjs(ngayPhat.DanhSachNgayPhat).format('DD/MM');
+              console.log('Matched by DanhSachNgayPhat:', event.TenLichPhat, displayDate);
+            }
+          });
+        }
+
+        if (shouldInclude) {
+          let color = "#4CAF50";
+          if (event.LoaiSuKien === 2) color = "#2196F3";
+          else if (event.LoaiSuKien === 3) color = "#E91E63";
+
+          monthlySchedules.push({ ...event, displayDate, color });
+        }
+      });
+
+      console.log('Filtered schedules:', monthlySchedules.length);
+    }
+
     return (
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="p-4 border-b border-gray-200 flex justify-between items-center">
-          <h2 className="m-0 text-lg font-medium">Lịch phát trong tháng</h2>
-          <div className="flex items-center gap-2.5">
-            <button
-              className="bg-transparent border-0 cursor-pointer text-gray-600 text-sm w-[30px] h-[30px] rounded-full flex items-center justify-center hover:bg-gray-100"
-              onClick={goToPreviousMonth}
-            >
-              <LeftOutlined />
-            </button>
-            <span className="text-base font-medium">{currentMonth}</span>
-            <button
-              className="bg-transparent border-0 cursor-pointer text-gray-600 text-sm w-[30px] h-[30px] rounded-full flex items-center justify-center hover:bg-gray-100"
-              onClick={goToNextMonth}
-            >
-              <RightOutlined />
-            </button>
-          </div>
-        </div>
-        <div className="relative p-4">
-          <div className="grid grid-cols-7 gap-1 mb-1">
-            <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
-              CN
-            </div>
-            <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
-              T2
-            </div>
-            <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
-              T3
-            </div>
-            <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
-              T4
-            </div>
-            <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
-              T5
-            </div>
-            <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
-              T6
-            </div>
-            <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
-              T7
-            </div>
-          </div>
-          <div className="grid grid-cols-7 gap-1" id="calendarGrid">
-            {calendarDays.map((day, index) => (
-              <div
-                key={index}
-                className={`relative p-2 border border-gray-200 rounded-md min-h-[90px] ${
-                  day.day
-                    ? "cursor-pointer hover:bg-gray-50 hover:shadow-sm transition-all duration-200"
-                    : "bg-gray-50/30"
-                } ${day.events.length > 0 ? "shadow-sm" : ""}`}
-                onClick={() =>
-                  day.day && day.events.length > 0
-                    ? showScheduleDetailModal(
-                        `${day.day}/${
-                          currentMonth.match(/Tháng (\d+), (\d+)/)[1]
-                        }/${currentMonth.match(/Tháng (\d+), (\d+)/)[2]}`,
-                        day.events
-                      )
-                    : null
-                }
-              >
-                <div
-                  className={`text-center font-medium ${
-                    day.day ? (index % 7 === 0 ? "" : "") : "text-gray-300"
-                  }`}
+      <Row gutter={16} className="bg-white rounded-lg shadow-md overflow-hidden">
+        <Col xs={24} lg={14}>
+          <div>
+            <div className="p-4 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="m-0 text-lg font-medium">Lịch phát trong tháng</h2>
+              <div className="flex items-center gap-2.5">
+                <button
+                  className="bg-transparent border-0 cursor-pointer text-gray-600 text-sm w-[30px] h-[30px] rounded-full flex items-center justify-center hover:bg-gray-100"
+                  onClick={goToPreviousMonth}
                 >
-                  {day.day}
-                </div>
-                {day.events.length > 0 && (
-                  <div className="relative mt-2 flex flex-col gap-1">
-                    {day.events.map((event, eventIndex) => (
-                      <div
-                        key={eventIndex}
-                        className="py-1 px-2 rounded text-xs text-white cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap shadow-sm z-10 hover:brightness-110 transition-all"
-                        style={{ backgroundColor: event.color }}
-                      >
-                        <div className="font-medium overflow-hidden text-ellipsis">
-                          {event.title}
-                        </div>
-                        <div className="text-[10px] opacity-90">
-                          {event.time}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                  <LeftOutlined />
+                </button>
+                <span className="text-base font-medium">{currentMonth}</span>
+                <button
+                  className="bg-transparent border-0 cursor-pointer text-gray-600 text-sm w-[30px] h-[30px] rounded-full flex items-center justify-center hover:bg-gray-100"
+                  onClick={goToNextMonth}
+                >
+                  <RightOutlined />
+                </button>
               </div>
-            ))}
+            </div>
+            <div className="relative p-4">
+              <div className="grid grid-cols-7 gap-1 mb-1">
+                <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
+                  CN
+                </div>
+                <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
+                  T2
+                </div>
+                <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
+                  T3
+                </div>
+                <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
+                  T4
+                </div>
+                <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
+                  T5
+                </div>
+                <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
+                  T6
+                </div>
+                <div className="p-2 text-center font-medium text-gray-700 bg-gray-50 rounded">
+                  T7
+                </div>
+              </div>
+              <div className="grid grid-cols-7 gap-1" id="calendarGrid">
+                {calendarDays.map((day, index) => (
+                  <div
+                    key={`day-${index}`}
+                    className={`relative p-2 border border-gray-200 rounded-md min-h-[90px] ${day.day
+                      ? "cursor-pointer hover:bg-gray-50 hover:shadow-sm transition-all duration-200"
+                      : "bg-gray-50/30"
+                      } ${day.events.length > 0 ? "shadow-sm" : ""}`}
+                    onClick={() =>
+                      day.day && day.events.length > 0
+                        ? showScheduleDetailModal(
+                          `${day.day}/${currentMonth.match(/Tháng (\d+), (\d+)/)[1]
+                          }/${currentMonth.match(/Tháng (\d+), (\d+)/)[2]}`,
+                          day.events
+                        )
+                        : null
+                    }
+                  >
+                    <div
+                      className={`text-center font-medium ${day.day ? (index % 7 === 0 ? "" : "") : "text-gray-300"
+                        }`}
+                    >
+                      {day.day}
+                    </div>
+                    {day.events.length > 0 && (
+                      <div className="relative mt-2 flex flex-col gap-1">
+                        {day.events.map((event, eventIndex) => (
+                          <div
+                            key={event.eventData?.LichPhatID || `event-${eventIndex}`}
+                            className="py-1 px-2 rounded text-xs text-white cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap shadow-sm z-10 hover:brightness-110 transition-all"
+                            style={{ backgroundColor: event.color }}
+                          >
+                            <div className="font-medium overflow-hidden text-ellipsis">
+                              {event.title}
+                            </div>
+                            <div className="text-[10px] opacity-90">
+                              {event.time}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </Col>
+
+        {/* Sidebar - Right Side (40%) */}
+        <Col xs={24} lg={10}>
+          <div className="border-l border-gray-200" style={{ minHeight: '600px' }}>
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="m-0 text-base font-medium flex items-center justify-between">
+                <span>Danh sách lịch phát</span>
+                <span className="bg-blue-100 text-blue-600 px-2 py-1 rounded text-sm">
+                  {monthlySchedules.length} lịch
+                </span>
+              </h3>
+            </div>
+            <div style={{ maxHeight: '550px', overflowY: 'auto', padding: '16px' }}>
+              {monthlySchedules.length > 0 ? (
+                <>
+                  <div className="space-y-3">
+                    {monthlySchedules
+                      .slice((sidebarPage - 1) * sidebarPageSize, sidebarPage * sidebarPageSize)
+                      .map((schedule) => (
+                        <div
+                          key={schedule.LichPhatID}
+                          className="border border-gray-200 rounded-lg p-3 hover:shadow-md transition-all"
+                          style={{ borderLeft: `4px solid ${schedule.color}` }}
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span
+                                  className="text-xs font-medium px-2 py-1 rounded"
+                                  style={{ backgroundColor: `${schedule.color}20`, color: schedule.color }}
+                                >
+                                  {schedule.displayDate}
+                                </span>
+                                <span className={`text-xs px-2 py-1 rounded ${schedule.TrangThai ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600'
+                                  }`}>
+                                  {schedule.TrangThai ? 'Hoạt động' : 'Tạm dừng'}
+                                </span>
+                              </div>
+                              <h4 className="text-sm font-medium m-0 mb-1">{schedule.TenLichPhat}</h4>
+                              <p className="text-xs text-gray-500 m-0">
+                                {schedule.ChiaNgay
+                                  ? `${schedule.GioBatDau?.substring(0, 5) || '00:00'} - ${schedule.GioKetThuc?.substring(0, 5) || '23:59'}`
+                                  : 'Luôn luôn'}
+                              </p>
+                            </div>
+                            <div className="flex gap-1">
+                              <Tooltip title="Sửa">
+                                <Button type="text" size="small" icon={<EditOutlined />}
+                                  onClick={() => showModalEdit(schedule.LichPhatID)} />
+                              </Tooltip>
+                              <Tooltip title="Xóa">
+                                <Button type="text" size="small" danger icon={<DeleteOutlined />}
+                                  onClick={() => deleteModalAddEdit(schedule.LichPhatID)} />
+                              </Tooltip>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                  {monthlySchedules.length > sidebarPageSize && (
+                    <div style={{ marginTop: '16px', textAlign: 'center' }}>
+                      <Pagination
+                        current={sidebarPage}
+                        pageSize={sidebarPageSize}
+                        total={monthlySchedules.length}
+                        onChange={(page) => setSidebarPage(page)}
+                        size="small"
+                        showSizeChanger={false}
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  <p>Không có lịch phát nào trong tháng này</p>
+                </div>
+              )}
+            </div>
+          </div>
+        </Col>
+      </Row >
     );
   };
 

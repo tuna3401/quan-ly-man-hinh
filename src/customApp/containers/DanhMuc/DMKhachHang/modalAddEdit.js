@@ -14,7 +14,7 @@ import {
   Radio,
   Modal as ModalAnt,
 } from 'antd';
-import  { Option } from '../../../../components/uielements/select';
+import { Option } from '../../../../components/uielements/select';
 import Modal from '../../../../components/uielements/modal';
 import { getValueConfigLocalByKey } from '../../../../helpers/utility';
 import { useDispatch, useSelector } from 'react-redux';
@@ -180,24 +180,24 @@ export default (props) => {
           </Select>
         </Item>
         <Item
-        label="Mã cơ quan"
-        name="MaCQ"
-        {...ITEM_LAYOUT}
-        rules={[
-          REQUIRED,
-          () => ({
-            validator(_, value) {
-              if (!inputError) {
-                return Promise.resolve();
-              }
-              return Promise.reject(new Error('Chỉ được nhập số và chữ không dấu, không sử dụng dấu cách.'));
-            },
-          }),
-        ]}
-      >
-        <Input onChange={handleChange} />
-      </Item>
-      <Item
+          label="Mã cơ quan"
+          name="MaCQ"
+          {...ITEM_LAYOUT}
+          rules={[
+            REQUIRED,
+            () => ({
+              validator(_, value) {
+                if (!inputError) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(new Error('Chỉ được nhập số và chữ không dấu, không sử dụng dấu cách.'));
+              },
+            }),
+          ]}
+        >
+          <Input onChange={handleChange} />
+        </Item>
+        <Item
           label="CMSAddress"
           name={'CMSAddress'}
           {...ITEM_LAYOUT}
@@ -227,8 +227,8 @@ export default (props) => {
             </Button>
           </Upload>
           {ListFileDinhKem && ListFileDinhKem?.length
-            ? ListFileDinhKem.map((item, index) => (
-              <p key={index}>
+            ? ListFileDinhKem.map((item) => (
+              <p key={item?.name || item?.TenFileGoc || `file-${Math.random()}`}>
                 <a target="_bank" href={item?.FileUrl}>
                   {item?.name || item?.TenFileGoc}
                 </a>

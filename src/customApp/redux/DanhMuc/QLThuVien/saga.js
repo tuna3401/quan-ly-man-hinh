@@ -1,7 +1,7 @@
-import {all, takeEvery, put, call} from 'redux-saga/effects';
+import { all, takeEvery, put, call } from 'redux-saga/effects';
 import api from '../../../containers/DanhMuc/QLThuVien/config';
 import actions from './actions';
-function* getInitData({payload}) {
+function* getInitData({ payload }) {
   try {
     const response = yield call(api.danhSachDMThuVien, payload.filterData);
     const responseMedia = yield call(api.DanhSachMedia, payload.filterData);
@@ -22,7 +22,7 @@ function* getInitData({payload}) {
     });
   }
 }
-function* getList({payload}) {
+function* getList({ payload }) {
   try {
     const response = yield call(api.danhSachQLThuVien, payload.filterData);
     yield put({

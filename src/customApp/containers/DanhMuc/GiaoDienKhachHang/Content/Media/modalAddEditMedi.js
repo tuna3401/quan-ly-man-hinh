@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Form,
   Space,
@@ -11,7 +11,7 @@ import {
   Spin,
   message,
 } from 'antd';
-import {Modal as ModalAnt} from 'antd';
+import { Modal as ModalAnt } from 'antd';
 import {
   Button,
   Modal,
@@ -23,15 +23,15 @@ import {
   CheckCircleOutlined,
   StopOutlined,
 } from '@ant-design/icons';
-import {REQUIRED} from '../../../../../../settings/constants';
+import { REQUIRED } from '../../../../../../settings/constants';
 import moment from 'moment';
 import dayjs from 'dayjs';
 import './style.css';
-const {Item, useForm} = Form;
+const { Item, useForm } = Form;
 
 export default (props) => {
   const [form] = useForm();
-  const {dataEdit, visible, actionmedia, DanhSachThuMuc, Statuss, setStatuss} =
+  const { dataEdit, visible, actionmedia, DanhSachThuMuc, Statuss, setStatuss } =
     props;
   useEffect(() => {
     if (dataEdit && dataEdit.ID) {
@@ -100,7 +100,7 @@ export default (props) => {
             TrangThai: true,
             Tag: fileItem.ListTag,
           };
-          const {onCreate} = props;
+          const { onCreate } = props;
           await onCreate(newValue, fileItem.file);
         } catch (error) {
           console.error(`Failed to upload file ${fileItem.file.name}:`, error);
@@ -140,7 +140,7 @@ export default (props) => {
           Tag: fileItem.ListTag,
         };
 
-        const {onCreate} = props;
+        const { onCreate } = props;
         await onCreate(newValue, fileList[index].file);
         // handleCancelFile(index);
         setLoading(true);
@@ -314,14 +314,14 @@ export default (props) => {
           marginBottom: '30px',
         }}
       >
-        <div style={{color: 'red', fontSize: '20px', fontFamily: 'Poppins, sans-serif'}}>
+        <div style={{ color: 'red', fontSize: '20px', fontFamily: 'Poppins, sans-serif' }}>
           Chú ý: Mỗi tệp đính kèm có dung lượng tối đa 300MB
         </div>
         <div>
           <input
             type="file"
             multiple
-            style={{display: 'none'}}
+            style={{ display: 'none' }}
             id="fileInput"
             onChange={handleUpload}
           />
@@ -335,7 +335,7 @@ export default (props) => {
             }}
             onClick={() => document.getElementById('fileInput').click()}
           >
-             Thêm tệp
+            Thêm tệp
           </Button>
           <Button
             style={{
@@ -381,9 +381,9 @@ export default (props) => {
           <TreeSelect
             treeData={treeSelectData}
             placeholder="Chọn thư mục"
-            style={{width: '30%'}}
+            style={{ width: '30%' }}
             treeDefaultExpandAll
-            onChange={(value) => form.setFieldsValue({ThuMucID: value})}
+            onChange={(value) => form.setFieldsValue({ ThuMucID: value })}
           />
         </Item>
         <Row
@@ -453,7 +453,7 @@ export default (props) => {
                 </Item>
               </Col>
               <div className={index % 2 === 0 ? 'odd-row' : 'even-row'}>
-                <div key={index}>
+                <div key={`file-info-${fileItem.id}`}>
                   <div>
                     <span>{formatFileSize(fileItem.file.size)} </span>
                     <div>{loading && <Spin />}</div>

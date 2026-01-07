@@ -1,6 +1,6 @@
-import {apiGetAuth, apiPostAuth} from '../../../../api';
+import { apiGetAuth, apiPostAuth } from '../../../../api';
 import server from '../../../../settings';
-import {getDefaultPageSize} from '../../../../helpers/utility';
+import { getDefaultPageSize } from '../../../../helpers/utility';
 
 const apiUrl = {
   danhsachthamsohethong: server.v2Url + 'SystemConfig/GetListPaging',

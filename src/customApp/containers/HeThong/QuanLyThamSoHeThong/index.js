@@ -92,7 +92,7 @@ const QLThamSoHeThong = (props) => {
                 ...filterData,
                 PageNumber:
                   Math.ceil((TotalRow - 1) / filterData.PageSize) <
-                  filterData.PageNumber
+                    filterData.PageNumber
                     ? Math.ceil((TotalRow - 1) / filterData.PageSize)
                     : filterData.PageNumber,
               });
@@ -102,7 +102,7 @@ const QLThamSoHeThong = (props) => {
                 ...filterData,
                 PageNumber:
                   Math.ceil((TotalRow - 1) / filterData.PageSize) <
-                  filterData.PageNumber
+                    filterData.PageNumber
                     ? Math.ceil((TotalRow - 1) / filterData.PageSize)
                     : filterData.PageNumber,
               });

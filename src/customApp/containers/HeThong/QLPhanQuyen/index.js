@@ -413,10 +413,10 @@ const QLPhanQuyen = (props) => {
                     </div>
                     <div className="content_class">
                       {Data.DanhSachNguoiDung &&
-                      Data.DanhSachNguoiDung.length ? (
+                        Data.DanhSachNguoiDung.length ? (
                         <div className={"ul"}>
-                          {Data.DanhSachNguoiDung.map((item, key) => (
-                            <div key={key} className={"li"}>
+                          {Data.DanhSachNguoiDung.map((item) => (
+                            <div key={item.NguoiDungID} className={"li"}>
                               <button
                                 onClick={() =>
                                   deleteUser({
@@ -572,7 +572,7 @@ const QLPhanQuyen = (props) => {
               if (item.Sua) defaultValue.push("Sua");
               if (item.Xoa) defaultValue.push("Xoa");
               return (
-                <div key={index} className="content_row">
+                <div key={item.PhanQuyenID} className="content_row">
                   <b className="tenchucnang">{item.TenChucNang}</b>
                   <div className="chonxoaquyen">
                     <Checkbox.Group
@@ -653,7 +653,7 @@ const QLPhanQuyen = (props) => {
                     if (item.Sua) defaultValue.push("Sua");
                     if (item.Xoa) defaultValue.push("Xoa");
                     return (
-                      <div key={index} className="content_row">
+                      <div key={item.PhanQuyenID} className="content_row">
                         <div className="tenchucnang">{item.TenChucNang}</div>
                         <div className="chonxoaquyen">
                           <Checkbox.Group
