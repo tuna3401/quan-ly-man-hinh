@@ -35,26 +35,14 @@ function* getInitData({ payload }) {
 }
 function* getList({ payload }) {
   try {
-    // apiDB.GetDataDb
     console.log(payload, "payload");
-    const response = yield call(
-      payload.filterData.activeTab === "1"
-        ? api.danhSachNgheNhan
-        : apiDB.GetDataDb,
-      payload.filterData
-    );
+    // Always use the same API for both tabs to ensure consistent data
+    const response = yield call(api.danhSachNgheNhan, payload.filterData);
 
-    // const responseAll = yield call(api.danhSachHuongDan, {
-    //   PageNumber: 1,
-    //   PageSize: 1000,
-    // });
     yield put({
       type: actions.SCHEDULEPLAYLIST_GET_LIST_REQUEST_SUCCESS,
       payload: {
-        dataSchedulePlayList:
-          payload.filterData.activeTab === "1"
-            ? response.data.Data
-            : response.data.Data.LichPhats,
+        dataSchedulePlayList: response.data.Data,
         TotalRow: response.data.TotalRow,
       },
     });

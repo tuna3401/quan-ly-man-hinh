@@ -517,9 +517,9 @@ const QLThuVien = (props) => {
             current={PageNumber}
             pageSize={PageSize}
             onChange={(page, pageSize) => onTableChange1(page, pageSize)}
-            // onShowSizeChange={(current, size) => {
-            //   onTableChange({ current: 1, pageSize: size }, null, null);
-            // }}
+          // onShowSizeChange={(current, size) => {
+          //   onTableChange({ current: 1, pageSize: size }, null, null);
+          // }}
           />
         </div>
       </Box>

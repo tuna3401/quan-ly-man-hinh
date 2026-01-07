@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {Form, Space, DatePicker, Select, Upload, Row, Col,TreeSelect} from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Space, DatePicker, Select, Upload, Row, Col, TreeSelect } from 'antd';
 import {
   Button,
   Modal,
@@ -11,16 +11,16 @@ import {
   CheckCircleOutlined,
   StopOutlined,
 } from '@ant-design/icons';
-import {REQUIRED} from '../../../../settings/constants';
+import { REQUIRED } from '../../../../settings/constants';
 import moment from 'moment';
 import dayjs from 'dayjs';
 import './style.css';
 
-const {Item, useForm} = Form;
+const { Item, useForm } = Form;
 
 export default (props) => {
   const [form] = useForm();
-  const {dataEdit, loading, visible, actionmedia,DanhSachThuMuc} = props;
+  const { dataEdit, loading, visible, actionmedia, DanhSachThuMuc } = props;
   useEffect(() => {
     if (dataEdit && dataEdit.ID) {
       form.setFieldsValue({
@@ -36,7 +36,7 @@ export default (props) => {
         message.warning('Chưa chọn file đính kèm');
         return;
       }
-  
+
       // Loop through fileList and call API for each file
       for (let index = 0; index < fileList.length; index++) {
         const fileItem = fileList[index];
@@ -49,7 +49,7 @@ export default (props) => {
           TrangThai: true,
           Tag: fileItem.ListTag,
         };
-  
+
         try {
           const { onCreate } = props;
           await onCreate(newValue, fileItem.file);
@@ -59,7 +59,7 @@ export default (props) => {
           console.error(`Failed to upload file ${fileItem.file.name}:`, error);
         }
       }
-  
+
       // Optional: After all files are processed, you can perform additional actions if needed
       // For example, clear fileList and reset form
       setFileList([]);
@@ -77,14 +77,14 @@ export default (props) => {
       const index = 0;
       const fileItem = fileList[index];
       let tenFileValue = values.TenFile || fileItem.TenFile
-       const newValue = {
-      ...values,
-      TenFile: fileItem.TenFile || fileItem.TenFilegoc,
-      Loai: fileItem.file.type.startsWith('image/') ? 'Hình Ảnh' : 'Video',
-      ThoiLuongTrinhChieu: "00:10:10",
-      KichThuoc: formatFileSize(fileItem.file.size),
-      Tag: fileItem.ListTag,
-    };
+      const newValue = {
+        ...values,
+        TenFile: fileItem.TenFile || fileItem.TenFilegoc,
+        Loai: fileItem.file.type.startsWith('image/') ? 'Hình Ảnh' : 'Video',
+        ThoiLuongTrinhChieu: "00:10:10",
+        KichThuoc: formatFileSize(fileItem.file.size),
+        Tag: fileItem.ListTag,
+      };
       const { onCreate } = props;
       onCreate(newValue, fileList[index].file);
       handleCancelFile(index);
@@ -96,17 +96,17 @@ export default (props) => {
     const files = Array.from(event.target.files).map((file) => ({
       file,
       id: `${file.name}-${file.lastModified}`,
-      TenFilegoc: file.name, 
+      TenFilegoc: file.name,
       ListTag: '',
     }));
-  
+
     setFileList([...fileList, ...files]);
-  
+
     // Log tên của từng file vào console
     files.forEach((file) => {
     });
   };
-  
+
 
   const formatFileSize = (size) => {
     if (size < 1024) return `${size} B`;
@@ -170,14 +170,14 @@ export default (props) => {
           marginBottom: '30px',
         }}
       >
-        <div style={{color: 'red', fontSize: '20px', fontFamily: 'Poppins, sans-serif'}}>
+        <div style={{ color: 'red', fontSize: '20px', fontFamily: 'Poppins, sans-serif' }}>
           Chú ý: Mỗi tệp đính kèm có dung lượng tối đa 300M
         </div>
         <div>
           <input
             type="file"
             multiple
-            style={{display: 'none'}}
+            style={{ display: 'none' }}
             id="fileInput"
             onChange={handleUpload}
           />
@@ -216,7 +216,7 @@ export default (props) => {
             }}
             onClick={handleCancelUpload}
           >
-            <StopOutlined style={{color: 'black'}} />
+            <StopOutlined style={{ color: 'black' }} />
             Hủy tải lên
           </Button>
           <Button
@@ -241,13 +241,13 @@ export default (props) => {
           name={'ThuMucID'}
           rules={[REQUIRED]}
         >
-           <TreeSelect
-              treeData={treeSelectData}
-              placeholder="Chọn thư mục"
-              style={{width:"30%"}}
-              treeDefaultExpandAll
-              onChange={(value) => form.setFieldsValue({ ThuMucID: value })}
-            />
+          <TreeSelect
+            treeData={treeSelectData}
+            placeholder="Chọn thư mục"
+            style={{ width: "30%" }}
+            treeDefaultExpandAll
+            onChange={(value) => form.setFieldsValue({ ThuMucID: value })}
+          />
         </Item>
         <Row
           gutter={[20, 20]}
@@ -296,7 +296,7 @@ export default (props) => {
                 <Item label="Tên">
                   <Input
                     value={fileItem.TenFile}
-                    
+
                   />
                 </Item>
               </Col>
@@ -307,15 +307,15 @@ export default (props) => {
                 <Item label="ListTag">
                   <Input
                     value={fileItem.ListTag}
-                    
+
                   />
                 </Item>
               </Col>
               <div className={index % 2 === 0 ? 'odd-row' : 'even-row'}>
-                <div key={index}>
+                <div key={`file-info-${fileItem.id}`}>
                   <div >
                     <span>{formatFileSize(fileItem.file.size)} </span>
-                    <span style={{display: 'inline-flex',float:"right",marginRight:"50px"}}>
+                    <span style={{ display: 'inline-flex', float: "right", marginRight: "50px" }}>
                       <UploadOutlined
                         style={{
                           color: 'white',
@@ -325,7 +325,7 @@ export default (props) => {
                           paddingLeft: '5px',
                           height: '30px',
                           width: '30px',
-                          
+
                         }}
                         onClick={onone}
                       />{' '}

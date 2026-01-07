@@ -1,6 +1,6 @@
-import {apiGetAuth, apiPostAuth, apiDownloadAuth} from '../../../../api';
+import { apiGetAuth, apiPostAuth, apiDownloadAuth } from '../../../../api';
 import server from '../../../../settings';
-import {getDefaultPageSize} from '../../../../helpers/utility';
+import { getDefaultPageSize } from '../../../../helpers/utility';
 
 export const apiUrl = {
   danhsachqlthuvien: server.v2Url + 'QuanLyDanhSachPhat/GetListPaging',
@@ -25,9 +25,19 @@ const api = {
     });
   },
   DanhSachMedia: (param) => {
-    return apiGetAuth(apiUrl.danhsachmedia, {
-      ...param,
-    });
+    // Clean up parameters - remove empty strings
+    const cleanParams = {};
+
+    if (param.Loai) cleanParams.Loai = param.Loai;
+    if (param.Keyword) cleanParams.Keyword = param.Keyword;
+    if (param.ThuMucID) cleanParams.ThuMucID = param.ThuMucID;
+    if (param.Status !== undefined && param.Status !== '') cleanParams.Status = param.Status;
+
+    // Always include PageNumber and PageSize with defaults
+    cleanParams.PageNumber = param.PageNumber || 1;
+    cleanParams.PageSize = param.PageSize || getDefaultPageSize();
+
+    return apiGetAuth(apiUrl.danhsachmedia, cleanParams);
   },
   DanhSachNguoiDung: (param) => {
     return apiGetAuth(apiUrl.danhsachnguoidung, {

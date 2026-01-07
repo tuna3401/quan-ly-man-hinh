@@ -258,18 +258,18 @@ const SignIn = (props) => {
                 modules={[Autoplay, Pagination]}
               >
                 {ListSlice
-                  ? ListSlice.map((slice) => (
-                      <SwiperSlide>
-                        <img src={slice.image} />
-                      </SwiperSlide>
-                    ))
+                  ? ListSlice.map((slice, index) => (
+                    <SwiperSlide key={slice.imageID || index}>
+                      <img src={slice.image} />
+                    </SwiperSlide>
+                  ))
                   : null}
               </Swiper>
             </div>
             <div className="main-content">
               <div className={"main-login"}>
                 <div className="main-login__title">
-                  <p class={"title"}>Đăng nhập</p>
+                  <p className={"title"}>Đăng nhập</p>
                 </div>
                 <div className="main-login__form">
                   <div className="field-wrap">
@@ -335,7 +335,7 @@ const SignIn = (props) => {
                 </div>
               </div>
               <div className={"helper"}>
-                <div class={"help-title"}>Thông tin hỗ trợ</div>
+                <div className={"help-title"}>Thông tin hỗ trợ</div>
                 <div className={"help-row"}>
                   <PhoneOutlined /> {phoneNumber}
                 </div>

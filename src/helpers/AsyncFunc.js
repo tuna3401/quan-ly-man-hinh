@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import Nprogress from 'nprogress';
 import ReactPlaceholder from 'react-placeholder';
 import 'nprogress/nprogress.css';
@@ -17,16 +17,14 @@ export default function asyncComponent(importComponent) {
       this.state = {
         component: null,
       };
-    }
-    componentWillMount() {
-      Nprogress.start();
+      Nprogress.start(); // Di chuyển từ componentWillMount vào đây
     }
     componentWillUnmount() {
       this.mounted = false;
     }
     async componentDidMount() {
       this.mounted = true;
-      const {default: Component} = await importComponent();
+      const { default: Component } = await importComponent();
       Nprogress.done();
       if (this.mounted) {
         const path = getPath(this.props.location.pathname);

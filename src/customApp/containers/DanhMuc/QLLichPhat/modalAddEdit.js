@@ -59,25 +59,8 @@ export default (props) => {
   useEffect(() => {
     if (dataEdit && dataEdit.LichPhatID) {
       const LoaiSuKienValue = dataEdit.LoaiSuKien;
-      const newRows = (dataEdit.DanhSachNgayPhats || []).map(
-        (entry, index) => ({
-          id: index,
-          DanhSachNgayPhat: dayjs(
-            `${entry.DanhSachNgayPhat}T00:00:00`,
-            "YYYY/MM/DDTHH:mm:ss"
-          ),
-          GioBatDau: dayjs(
-            `0000/01/01 ${entry.GioBatDau}`,
-            "YYYY/MM/DD HH:mm:ss"
-          ),
-          GioKetThuc: dayjs(
-            `0000/01/01 ${entry.GioKetThuc}`,
-            "YYYY/MM/DD HH:mm:ss"
-          ),
-        })
-      );
-      setRows(newRows);
       setSelectedLoaiSuKien(LoaiSuKienValue);
+
       const ListManHinhOrNhomManHinhs = dataEdit.ListManHinhOrNhomManHinh;
       const fieldsValue = {
         ...dataEdit,
@@ -85,11 +68,21 @@ export default (props) => {
           (item) => item.ID
         ),
       };
-      newRows.forEach((row) => {
-        fieldsValue[`NgayPhat_${row.id}`] = row.DanhSachNgayPhat;
-        fieldsValue[`GioBatDau_${row.id}`] = row.GioBatDau;
-        fieldsValue[`GioKetThuc_${row.id}`] = row.GioKetThuc;
-      });
+
+      // Handle date range for ChiaNgay = true
+      if (dataEdit.DanhSachNgayPhats && dataEdit.DanhSachNgayPhats.length > 0) {
+        const sortedDates = [...dataEdit.DanhSachNgayPhats].sort(
+          (a, b) => new Date(a.DanhSachNgayPhat) - new Date(b.DanhSachNgayPhat)
+        );
+
+        const firstEntry = sortedDates[0];
+        const lastEntry = sortedDates[sortedDates.length - 1];
+
+        fieldsValue.NgayBatDau = dayjs(firstEntry.DanhSachNgayPhat, 'YYYY-MM-DD');
+        fieldsValue.NgayKetThuc = dayjs(lastEntry.DanhSachNgayPhat, 'YYYY-MM-DD');
+        fieldsValue.GioBatDau = dayjs(`0000/01/01 ${firstEntry.GioBatDau}`, 'YYYY/MM/DD HH:mm:ss');
+        fieldsValue.GioKetThuc = dayjs(`0000/01/01 ${firstEntry.GioKetThuc}`, 'YYYY/MM/DD HH:mm:ss');
+      }
 
       form.setFieldsValue(fieldsValue);
       setChiaNgay(dataEdit.ChiaNgay);
@@ -160,22 +153,31 @@ export default (props) => {
         TitleMediaORDanhSachPhat: selectedMediaOrPlaylist?.Title,
       };
       if (ChiaNgay) {
-        const DanhSachNgayPhat = rows.map((row) => ({
-          DanhSachNgayPhat: [
-            values[`NgayPhat_${row.id}`]?.format("YYYY-MM-DDTHH:mm:ss"),
-          ],
-          GioBatDau: values[`GioBatDau_${row.id}`]?.format("HH:mm:ss"),
-          GioKetThuc: values[`GioKetThuc_${row.id}`]?.format("HH:mm:ss"),
-        }));
+        // Generate date array from date range
+        const startDate = values.NgayBatDau;
+        const endDate = values.NgayKetThuc;
+        const gioBatDau = values.GioBatDau;
+        const gioKetThuc = values.GioKetThuc;
+
+        const DanhSachNgayPhat = [];
+        let currentDate = startDate.clone();
+
+        while (currentDate.isBefore(endDate, 'day') || currentDate.isSame(endDate, 'day')) {
+          DanhSachNgayPhat.push({
+            DanhSachNgayPhat: [currentDate.format('YYYY-MM-DDTHH:mm:ss')],
+            GioBatDau: gioBatDau.format('HH:mm:ss'),
+            GioKetThuc: gioKetThuc.format('HH:mm:ss'),
+          });
+          currentDate = currentDate.add(1, 'day');
+        }
 
         payload.DanhSachNgayPhat = DanhSachNgayPhat;
 
-        // Remove NgayPhat, GioBatDau, GioKetThuc from values
-        rows.forEach((row) => {
-          delete payload[`NgayPhat_${row.id}`];
-          delete payload[`GioBatDau_${row.id}`];
-          delete payload[`GioKetThuc_${row.id}`];
-        });
+        // Remove date/time fields from payload
+        delete payload.NgayBatDau;
+        delete payload.NgayKetThuc;
+        delete payload.GioBatDau;
+        delete payload.GioKetThuc;
       } else {
         payload.DanhSachNgayPhat = [];
       }
@@ -213,14 +215,7 @@ export default (props) => {
     }
   };
 
-  const [rows, setRows] = useState([{}]);
-  const addRow = () => {
-    setRows([...rows, { id: Date.now() }]);
-  };
 
-  const removeRow = (id) => {
-    setRows(rows.filter((row) => row.id !== id));
-  };
   return (
     <Modal
       title={`${action === "edit" ? "Sửa" : "Thêm mới"} lịch phát`}
@@ -238,7 +233,7 @@ export default (props) => {
           form="formDiSanTuLieu"
           // loading={loading}
           onClick={onOk}
-          // disabled={isFormSuccess}
+        // disabled={isFormSuccess}
         >
           Lưu
         </Button>,
@@ -264,7 +259,7 @@ export default (props) => {
                 handleGetListSuggest(selectedLoaiSuKien); // Call handleGetListSuggest with the current selectedLoaiSuKien
                 handleGetManHinhOrNhomManHinh(); // Call handleGetManHinhOrNhomManHinh when a value is selected
               }}
-              // style={{width: '200px'}}
+            // style={{width: '200px'}}
             >
               {DanhSachMenu?.map((item) => (
                 <Option value={item.ID}>{item.Ten}</Option>
@@ -287,7 +282,7 @@ export default (props) => {
               setSelectedLoaiSuKien(value);
               form.setFieldsValue({ MediaORDanhSachPhat: undefined }); // Clear Media/Danh sách phát
             }}
-            // style={{width: '200px'}}
+          // style={{width: '200px'}}
           >
             {DanhSachLoaiSuKien?.map((item) => (
               <Option value={item.ID}>{item.TenSuKien}</Option>
@@ -302,7 +297,7 @@ export default (props) => {
         >
           <Select
             allowClear
-            // style={{width: '200px'}}
+          // style={{width: '200px'}}
           >
             {danhSachMauPhieuSuggest?.map((item) => (
               <Option value={item.ID}>{item.Ten}</Option>
@@ -318,7 +313,7 @@ export default (props) => {
           <Select
             mode="multiple"
             allowClear
-            // style={{width: '200px'}}
+          // style={{width: '200px'}}
           >
             {DanhSachManHinhOrNhomManHinh?.map((item) => (
               <Option value={item.ID}>{item.Ten}</Option>
@@ -338,57 +333,80 @@ export default (props) => {
         </Item>
         {ChiaNgay && (
           <>
-            {rows.map((row) => (
-              <Row key={row.id} gutter={16}>
-                <Col span={9}>
-                  <Item
-                    label="Chọn ngày"
-                    name={`NgayPhat_${row.id}`}
-                    {...ITEM_LAYOUT}
-                    rules={[REQUIRED]}
-                  >
-                    <DatePicker
-                      format="DD/MM/YYYY"
-                      placeholder=""
-                      style={{ width: "100%" }}
-                    />
-                  </Item>
-                </Col>
-                <Col span={7}>
-                  <Item
-                    label="Bắt đầu"
-                    name={`GioBatDau_${row.id}`}
-                    {...ITEM_LAYOUT}
-                    rules={[REQUIRED]}
-                  >
-                    <TimePicker placeholder="Giờ bắt đầu" />
-                  </Item>
-                </Col>
-                <Col span={7}>
-                  <Item
-                    label="Kết thúc"
-                    name={`GioKetThuc_${row.id}`}
-                    {...ITEM_LAYOUT}
-                    rules={[REQUIRED]}
-                  >
-                    <TimePicker placeholder="Giờ kết thúc" />
-                  </Item>
-                </Col>
-                <Col span={1}>
-                  <DeleteOutlined
-                    onClick={() => removeRow(row.id)}
-                    style={{ marginTop: "10px" }}
+            <Row gutter={16}>
+              <Col span={12}>
+                <Item
+                  label="Ngày bắt đầu"
+                  name="NgayBatDau"
+                  {...ITEM_LAYOUT}
+                  rules={[REQUIRED]}
+                >
+                  <DatePicker
+                    format="DD/MM/YYYY"
+                    placeholder="Chọn ngày bắt đầu"
+                    style={{ width: "100%" }}
                   />
-                </Col>
-              </Row>
-            ))}
-            <Button
-              type="dashed"
-              onClick={addRow}
-              style={{ width: "100%", marginBottom: 16 }}
-            >
-              <PlusOutlined /> Thêm mốc thời gian mới
-            </Button>
+                </Item>
+              </Col>
+              <Col span={12}>
+                <Item
+                  label="Ngày kết thúc"
+                  name="NgayKetThuc"
+                  {...ITEM_LAYOUT}
+                  rules={[
+                    REQUIRED,
+                    ({ getFieldValue }) => ({
+                      validator(_, value) {
+                        const startDate = getFieldValue('NgayBatDau');
+                        if (!value || !startDate) {
+                          return Promise.resolve();
+                        }
+                        if (value.isAfter(startDate, 'day') || value.isSame(startDate, 'day')) {
+                          return Promise.resolve();
+                        }
+                        return Promise.reject(new Error('Ngày kết thúc phải >= ngày bắt đầu'));
+                      },
+                    }),
+                  ]}
+                >
+                  <DatePicker
+                    format="DD/MM/YYYY"
+                    placeholder="Chọn ngày kết thúc"
+                    style={{ width: "100%" }}
+                  />
+                </Item>
+              </Col>
+            </Row>
+            <Row gutter={16}>
+              <Col span={12}>
+                <Item
+                  label="Giờ bắt đầu"
+                  name="GioBatDau"
+                  {...ITEM_LAYOUT}
+                  rules={[REQUIRED]}
+                >
+                  <TimePicker
+                    placeholder="Chọn giờ bắt đầu"
+                    format="HH:mm:ss"
+                    style={{ width: "100%" }}
+                  />
+                </Item>
+              </Col>
+              <Col span={12}>
+                <Item
+                  label="Giờ kết thúc"
+                  name="GioKetThuc"
+                  {...ITEM_LAYOUT}
+                  rules={[REQUIRED]}
+                >
+                  <TimePicker
+                    placeholder="Chọn giờ kết thúc"
+                    format="HH:mm:ss"
+                    style={{ width: "100%" }}
+                  />
+                </Item>
+              </Col>
+            </Row>
           </>
         )}
 

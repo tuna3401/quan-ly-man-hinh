@@ -22,10 +22,12 @@ const api = {
     });
   },
   danhSachNgheNhan: (param) => {
+    // Remove activeTab from params as it's only for frontend tab switching
+    const { activeTab, ...apiParams } = param || {};
     return apiGetAuth(apiUrl.danhsachnghenhan, {
-      ...param,
-      PageNumber: param.PageNumber ? param.PageNumber : 1,
-      PageSize: param.PageSize ? param.PageSize : getDefaultPageSize(),
+      ...apiParams,
+      PageNumber: apiParams.PageNumber || 1,
+      PageSize: apiParams.PageSize || getDefaultPageSize(),
     });
   },
   danhSachLoaiSuKien: (param) => {

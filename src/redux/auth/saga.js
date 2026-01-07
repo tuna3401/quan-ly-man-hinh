@@ -1,5 +1,5 @@
-import {all, takeEvery, put, fork, call} from 'redux-saga/effects';
-import {push} from 'react-router-redux';
+import { all, takeEvery, put, fork, call } from 'redux-saga/effects';
+import { push } from 'react-router-redux';
 import {
   getToken,
   clearToken,
@@ -9,23 +9,23 @@ import {
 } from '../../helpers/utility';
 import actions from './actions';
 import api from '../../containers/Page/config';
-import {apiUrl} from '../../containers/Page/config';
+import { apiUrl } from '../../containers/Page/config';
 import axios from 'axios';
-import {history} from '../store';
+import { history } from '../store';
 import Pako from 'pako';
-import {getTokenDecode} from '../../helpers/utility';
-import {createTreeSidebar} from '../../helpers/utility';
+import { getTokenDecode } from '../../helpers/utility';
+import { createTreeSidebar } from '../../helpers/utility';
 export function* loginRequest() {
-  yield takeEvery('LOGIN_REQUEST', function* ({payload}) {
+  yield takeEvery('LOGIN_REQUEST', function* ({ payload }) {
     try {
-      const {data} = payload;
+      const { data } = payload;
       if (data.Status > 0) {
         const access_token = data.Data;
         // const realToken = getTokenDecode(access_token);
         //get data config
         // const ListConfig = yield call(api.getListConfig, {PageSize: 999});
         const ListConfig = yield axios.get(apiUrl.listconfig, {
-          params: {PageSize: 999, PageNumber: 1},
+          params: { PageSize: 999, PageNumber: 1 },
           headers: {
             Authorization: `Bearer ${data.Data}`,
           },
@@ -99,7 +99,7 @@ export function* loginSuccess() {
 }
 
 export function* loginError() {
-  yield takeEvery(actions.LOGIN_ERROR, function* () {});
+  yield takeEvery(actions.LOGIN_ERROR, function* () { });
 }
 
 export function* logout() {
@@ -117,6 +117,13 @@ export function* checkAuthorization(key) {
   yield takeEvery(actions.CHECK_AUTHORIZATION, function* () {
     try {
       const accessToken = getLocalKey('access_token');
+      if (!accessToken) {
+        clearToken();
+        if (window.location.pathname !== '/signin' && window.location.pathname !== '/quen-mat-khau') {
+          yield put(push('/signin'));
+        }
+        return;
+      }
       // const oldTokenDeocde = getTokenDecode(accessToken);
       const responseToken = yield axios.post(apiUrl.refreshtoken, null, {
         headers: {
@@ -127,7 +134,7 @@ export function* checkAuthorization(key) {
       // const newTokenDecode = getTokenDecode(newToken);
       if (newToken) {
         const ListConfig = yield axios.get(apiUrl.listconfig, {
-          params: {PageSize: 999},
+          params: { PageSize: 999 },
           headers: {
             Authorization: `Bearer ${newToken}`,
           },

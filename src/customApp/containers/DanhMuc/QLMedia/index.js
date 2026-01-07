@@ -869,7 +869,7 @@ const DMChiTieu = (props) => {
                     >
                       {item.ListTag.map((tag, index) => (
                         <span
-                          key={index}
+                          key={`tag-${index}-${tag}`}
                           style={{
                             padding: "2px 8px",
                             background: "rgb(242, 242, 242)",

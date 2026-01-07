@@ -1,4 +1,4 @@
-import { Modal, Table, Tooltip, message } from "antd";
+import { Modal, Tooltip, message, Row, Col, Pagination } from "antd";
 import actions from "../../../redux/DanhMuc/QuanLyManHinh/actions";
 import React, { useState, useEffect } from "react";
 import { connect } from "react-redux";
@@ -7,16 +7,13 @@ import PageHeader from "../../../../components/utility/pageHeader";
 import PageAction from "../../../../components/utility/pageAction";
 import Box from "../../../../components/utility/box";
 import BoxFilter from "../../../../components/utility/boxFilter";
-import BoxTable from "../../../../components/utility/boxTable";
 import {
   Button,
   InputSearch,
   Select,
 } from "../../../../components/uielements/exportComponent";
-import Checkbox from "../../../../components/uielements/checkbox";
 import {
   changeUrlFilter,
-  exportExcel,
   getDefaultPageSize,
   getFilterData,
   getRoleByKey,
@@ -24,22 +21,21 @@ import {
 import { useKey } from "../../../CustomHook/useKey";
 import queryString from "query-string";
 import api from "./config";
-import moment from "moment";
 import ModalAddEdit from "./modalAddEdit";
-import { DeleteOutlined, EditOutlined, PlusOutlined } from "@ant-design/icons";
-import { useSelector } from "react-redux";
+import { PlusOutlined } from "@ant-design/icons";
 import PageWrap from "../../../../components/utility/PageWrap";
+import DeviceCard from "./DeviceCard";
+
 const QuanLyManHinh = (props) => {
-  const [filterData, setFilterData] = useState(
-    queryString.parse(props.location.search)
-  );
-  console.log("props", props);
+  const [filterData, setFilterData] = useState({
+    ...queryString.parse(props.location.search),
+    PageSize: queryString.parse(props.location.search).PageSize || 6,
+  });
 
   const [dataModalAddEdit, setDataModalAddEdit] = useState([]);
   const [visibleModalAddEdit, setVisibleModalAddEdit] = useState(false);
   const [action, setAction] = useState("");
   const [modalKey, inceaseModalKey] = useKey();
-  const [selectedRowsKey, setSelectedRowsKey] = useState([]);
   const [confirmLoading, setConfirmLoading] = useState(false);
 
   document.title = "Quản Lý Màn Hình";
@@ -53,22 +49,11 @@ const QuanLyManHinh = (props) => {
     props.getList(filterData);
   }, []);
 
-  const onTableChange = (pagination, filters, sorter) => {
-    let oldFilterData = filterData;
-    let onOrder = { pagination, filters, sorter };
-    let newFilterData = getFilterData(oldFilterData, null, onOrder);
-
-    setFilterData(newFilterData);
-    setSelectedRowsKey([]);
-  };
-
   const onFilter = (value, property) => {
     let oldFilterData = filterData;
     let onFilter = { value, property };
     let newfilterData = getFilterData(oldFilterData, onFilter, null);
-    //get filter data
     setFilterData(newfilterData);
-    setSelectedRowsKey([]);
   };
 
   const showModalAdd = () => {
@@ -95,7 +80,7 @@ const QuanLyManHinh = (props) => {
                 ...filterData,
                 PageNumber:
                   Math.ceil((TotalRow - 1) / filterData.PageSize) <
-                  filterData.PageNumber
+                    filterData.PageNumber
                     ? Math.ceil((TotalRow - 1) / filterData.PageSize)
                     : filterData.PageNumber,
               });
@@ -105,7 +90,7 @@ const QuanLyManHinh = (props) => {
                 ...filterData,
                 PageNumber:
                   Math.ceil((TotalRow - 1) / filterData.PageSize) <
-                  filterData.PageNumber
+                    filterData.PageNumber
                     ? Math.ceil((TotalRow - 1) / filterData.PageSize)
                     : filterData.PageNumber,
               });
@@ -144,7 +129,6 @@ const QuanLyManHinh = (props) => {
   };
 
   const hideModalAddEdit = () => {
-    setSelectedRowsKey([]);
     setDataModalAddEdit({});
     setVisibleModalAddEdit(false);
   };
@@ -197,109 +181,31 @@ const QuanLyManHinh = (props) => {
     }
   };
 
-  const renderThaoTac = (record) => {
-    return (
-      <div className={"action-btn"}>
-        {/* {role?.edit ? ( */}
-        <Tooltip title={"Sửa"}>
-          <EditOutlined onClick={() => showModalEdit(record.ManHinhID)} />
-        </Tooltip>
-        {/* ) : ( */}
-        {/* '' */}
-        {/* )} */}
-        {/* {role?.delete ? ( */}
-        <Tooltip title={"Xóa"}>
-          <DeleteOutlined
-            onClick={() => deleteModalAddEdit(record.ManHinhID)}
-          />
-        </Tooltip>
-        {/* ) : (
-          ''
-        )} */}
-      </div>
-    );
-  };
+  const onPageChange = (page, pageSize) => {
+    const newFilterData = {
+      ...filterData,
+      PageNumber: page,
+      PageSize: pageSize,
+    }
+    setFilterData(newFilterData);
+  }
+
   const { DanhSachManHinh, TotalRow, role } = props;
   const PageNumber = filterData.PageNumber
     ? parseInt(filterData.PageNumber)
     : 1;
   const PageSize = filterData.PageSize
     ? parseInt(filterData.PageSize)
-    : getDefaultPageSize();
-  const [nhomManHinhs, setNhomManHinhs] = useState([]);
+    : 6;
 
-  const columns = [
-    {
-      title: "STT",
-      align: "center",
-      width: "5%",
-      render: (text, record, index) => (
-        <span>{(PageNumber - 1) * PageSize + (index + 1)}</span>
-      ),
-    },
-    {
-      title: "HardwareKey",
-      dataIndex: "HardwareKey",
-      width: "20%",
-    },
-    {
-      title: "Tên màn hình",
-      dataIndex: "TenManHinh",
-      width: "25%",
-    },
-    {
-      title: "Địa chỉ mac",
-      dataIndex: "DiaChiMac",
-      width: "15%",
-    },
-    {
-      title: "Trạng thái",
-      dataIndex: "TrangThai",
-      align: "left",
-      width: "10%",
-      render: (text, record) => {
-        return record.TrangThai ? "Hoạt động" : "Không hoạt động"; // Assuming TrangThai is boolean
-      },
-    },
-    {
-      title: "Nhóm",
-      dataIndex: "NhomManHinhs",
-      align: "center",
-      width: "15%",
-      render: (text, record) => {
-        if (record.NhomManHinhs && record.NhomManHinhs.length > 0) {
-          // Assuming you want to render the first group's name
-          return record.NhomManHinhs[0].TenNhom;
-        } else {
-          return ""; // Handle case where there are no groups or handle accordingly
-        }
-      },
-    },
-    {
-      title: "Thao tác",
-      width: "10%",
-      align: "center",
-      margin: "10px",
-      render: (text, record) => renderThaoTac(record),
-    },
-  ];
   return (
     <LayoutWrapper>
       <PageWrap>
-        {/* <PageHeader>QUẢN LÝ MÀN HÌNH</PageHeader> */}
         <PageAction>
-          {/* {role ? (
-            role.add ? ( */}
           <Button type="primary" onClick={showModalAdd}>
             <PlusOutlined />
             Thêm mới
           </Button>
-          {/* ) : (
-              ''
-            )
-          ) : (
-            ''
-          )} */}
         </PageAction>
       </PageWrap>
       <Box>
@@ -312,21 +218,41 @@ const QuanLyManHinh = (props) => {
             allowClear
           />
         </BoxFilter>
-        <BoxTable
-          columns={columns}
-          // scroll={{ y: 500 }}
-          dataSource={DanhSachManHinh}
-          onChange={onTableChange}
-          pagination={{
-            showSizeChanger: true,
-            showTotal: (total, range) =>
-              `Từ ${range[0]} đến ${range[1]} trên ${total} kết quả`,
-            total: TotalRow,
-            current: PageNumber,
-            pageSize: PageSize,
-          }}
-          rowKey={(record) => record.ID}
-        />
+
+        {/* --- GRID VIEW REFACORING START --- */}
+        <div style={{ padding: '20px 0' }}>
+          {DanhSachManHinh && DanhSachManHinh.length > 0 ? (
+            <Row gutter={[24, 24]}>
+              {DanhSachManHinh.map((item) => (
+                <Col xs={24} md={12} xl={8} key={item.ManHinhID}>
+                  <DeviceCard
+                    data={item}
+                    onEdit={showModalEdit}
+                    onDelete={deleteModalAddEdit}
+                  />
+                </Col>
+              ))}
+            </Row>
+          ) : (
+            <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>
+              Không có dữ liệu
+            </div>
+          )}
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+          <Pagination
+            current={PageNumber}
+            pageSize={PageSize}
+            total={TotalRow}
+            onChange={onPageChange}
+            showSizeChanger
+            pageSizeOptions={['6', '12', '18', '24']}
+            showTotal={(total, range) => `Từ ${range[0]} đến ${range[1]} trên ${total} kết quả`}
+          />
+        </div>
+        {/* --- GRID VIEW REFACORING END --- */}
+
       </Box>
       <ModalAddEdit
         visible={visibleModalAddEdit}

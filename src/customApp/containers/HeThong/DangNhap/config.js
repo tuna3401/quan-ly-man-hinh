@@ -6,13 +6,13 @@ import {
   apiGetByKey,
 } from '../../../../api';
 import server from '../../../../settings';
-import {getDefaultPageSize} from '../../../../helpers/utility';
+import { getDefaultPageSize } from '../../../../helpers/utility';
 
 const apiUrl = {
   dangnhap: server.v2Url + 'Nguoidung/DangNhap',
   dangnhapsso: server.v2Url + 'LoginSSO/Login',
   chitiet: server.v2Url + 'HeThongNguoiDung/GetByIDForPhanQuyen',
-  // getdataconfig: server.v2Url + 'SystemConfig/GetByKeyNotAuthorized',
+  getdataconfig: server.v2Url + 'SystemConfig/GetByKeyNotAuthorized',
   listconfig: server.v2Url + 'SystemConfig/GetListPaging',
 };
 const api = {
@@ -37,7 +37,7 @@ const api = {
     });
   },
   getDataConfig: (param) => {
-    return apiGet(apiUrl.getdataconfig, {...param});
+    return apiGet(apiUrl.getdataconfig, { ...param });
   },
   getListConfig: (param) => {
     return apiGet(apiUrl.listconfig, {

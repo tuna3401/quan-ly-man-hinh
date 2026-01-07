@@ -1,4 +1,4 @@
-import {store, history} from '../redux/store';
+import { store, history } from '../redux/store';
 import axios from 'axios';
 import auth_actions from '../redux/auth/actions';
 import {
@@ -7,8 +7,8 @@ import {
   getToken,
   getTokenDecode,
 } from '../helpers/utility';
-import {message, Modal} from 'antd';
-import Constants, {SECRETKEY} from '../settings/constants';
+import { message, Modal } from 'antd';
+import Constants, { SECRETKEY } from '../settings/constants';
 import moment from 'moment';
 
 const user = () => {
@@ -22,7 +22,7 @@ const refreshToken = async () => {
       type: auth_actions.LOGOUT,
     });
     history.replace('/signin');
-  } catch (err) {}
+  } catch (err) { }
 };
 
 const checkRefreshToken = () => {
@@ -113,7 +113,7 @@ const getConfigKey = async (headers = {}) => {
   };
 };
 
-export {getConfig};
+export { getConfig };
 
 const callApi = (
   url,
@@ -155,6 +155,15 @@ const callApi = (
     data = {};
   }
 
+  // Validate URL before calling axios
+  if (!url || typeof url !== 'string') {
+    console.error('Invalid URL:', url);
+    return Promise.reject({
+      message: 'URL không hợp lệ',
+      data: { Status: -1, Message: 'URL không hợp lệ' }
+    });
+  }
+
   return axios({
     method,
     url,
@@ -172,44 +181,74 @@ const callApi = (
       return response;
     })
     .catch(function (error) {
-      if (error.response) {
-        const statusText = error.response.Message
-          ? error.response.Message
-          : 'Lỗi hệ thống';
-        // The request was made and the server responded with a status code
-        const status = error?.response?.status;
-        if (status === 401) {
-          auth_actions.logout();
+      try {
+        if (error.response) {
+          const statusText = error.response.Message
+            ? error.response.Message
+            : 'Lỗi hệ thống';
+          // The request was made and the server responded with a status code
+          const status = error?.response?.status;
+          if (status === 401) {
+            auth_actions.logout();
+            message.error(statusText);
+            return error.response;
+            // return;
+          }
+          // environment should not be used
+          if (status === 403) {
+            message.error(statusText);
+            return error.response;
+            // history.push('404');
+            // return error.response;
+          }
+          if (status <= 504 && status >= 500) {
+            message.error(statusText);
+            return error.response;
+            // router.push('/exception/500');
+            // return;
+          }
+          if (status >= 404 && status < 422) {
+            message.error(statusText);
+            return error.response;
+            // history.push('404');
+            // return;
+          }
+          // Default: return error response for any other status codes
           message.error(statusText);
           return error.response;
-          // return;
+        } else if (error.request) {
+          // The request was made but no response was received
+          // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+          // http.ClientRequest in node.js
+          message.error('Không thể kết nối đến máy chủ. Vui lòng kiểm tra kết nối mạng.');
+          console.error('Network Error:', error.request);
+          return {
+            data: {
+              Status: -1,
+              Message: 'Lỗi kết nối mạng',
+            },
+          };
+        } else {
+          // Something happened in setting up the request that triggered an Error
+          const errorMsg = error?.message || error?.toString() || 'Lỗi không xác định';
+          message.error('Đã xảy ra lỗi khi gửi yêu cầu. Vui lòng thử lại.');
+          console.error('Request Setup Error:', errorMsg, error);
+          return {
+            data: {
+              Status: -1,
+              Message: errorMsg,
+            },
+          };
         }
-        // environment should not be used
-        if (status === 403) {
-          message.error(statusText);
-          return error.response;
-          // history.push('404');
-          // return error.response;
-        }
-        if (status <= 504 && status >= 500) {
-          message.error(statusText);
-          return error.response;
-          // router.push('/exception/500');
-          // return;
-        }
-        if (status >= 404 && status < 422) {
-          message.error(statusText);
-          return error.response;
-          // history.push('404');
-          // return;
-        }
-      } else if (error.request) {
-        // The request was made but no response was received
-        // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
-        // http.ClientRequest in node.js
-      } else {
-        // Something happened in setting up the request that triggered an Error
-       
+      } catch (catchError) {
+        // Fallback nếu xử lý error bị lỗi
+        console.error('Error in error handler:', catchError);
+        return {
+          data: {
+            Status: -1,
+            Message: 'Lỗi hệ thống',
+          },
+        };
       }
       //Error config
     });
@@ -280,7 +319,7 @@ function b64toBlob(dataURI) {
   for (let i = 0; i < byteString.length; i++) {
     ia[i] = byteString.charCodeAt(i);
   }
-  return new Blob([ab], {type: fileType}); //eg: image/jpg
+  return new Blob([ab], { type: fileType }); //eg: image/jpg
 }
 
 export const apiGetUser = async (url, params = null, headers = {}) => {
@@ -294,7 +333,7 @@ export const apiGetUser = async (url, params = null, headers = {}) => {
       ...headers,
       Authorization: `Bearer ${params.Token}`,
     };
-    return apiGet(url, {NguoiDungID: params.NguoiDungID}, _headers);
+    return apiGet(url, { NguoiDungID: params.NguoiDungID }, _headers);
   }
 };
 

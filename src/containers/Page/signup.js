@@ -18,10 +18,10 @@ class SignUp extends Component {
   state = {
     redirectToReferrer: false
   };
-  componentWillReceiveProps(nextProps) {
+  componentDidUpdate(prevProps) {
     if (
-      this.props.isLoggedIn !== nextProps.isLoggedIn &&
-      nextProps.isLoggedIn === true
+      prevProps.isLoggedIn !== this.props.isLoggedIn &&
+      this.props.isLoggedIn === true
     ) {
       this.setState({ redirectToReferrer: true });
     }

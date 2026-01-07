@@ -49,7 +49,6 @@
     "mammoth": "^1.6.0",
     "moment": "^2.30.1",
     "monet": "^0.9.3",
-    "node-sass": "^9.0.0",
     "nprogress": "^0.2.0",
     "numeral": "^2.0.6",
     "pako": "^2.1.0",
@@ -128,7 +127,8 @@
   "devDependencies": {
     "babel-polyfill": "^6.26.0",
     "react-app-rewired": "2.2.1",
-    "redux-mock-store": "^1.5.4"
+    "redux-mock-store": "^1.5.4",
+    "sass": "^1.97.2"
   },
   "scripts": {
     "start": "react-app-rewired start",

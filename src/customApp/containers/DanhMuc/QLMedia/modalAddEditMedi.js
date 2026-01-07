@@ -434,7 +434,7 @@ export default (props) => {
                 </Item>
               </Col>
               <div className={index % 2 === 0 ? "odd-row" : "even-row"}>
-                <div key={index}>
+                <div key={`file-info-${fileItem.id}`}>
                   <div
                     style={{ display: "flex", justifyContent: "space-around" }}
                   >
