@@ -40,10 +40,28 @@ export default (props) => {
       // Loop through fileList and call API for each file
       for (let index = 0; index < fileList.length; index++) {
         const fileItem = fileList[index];
+
+        // Determine file type
+        const isImage = fileItem.file.type.startsWith('image/');
+        const isPDF = fileItem.file.type === 'application/pdf';
+        const isPPTX = fileItem.file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+          fileItem.file.type === 'application/vnd.ms-powerpoint';
+
+        let fileType;
+        if (isImage) {
+          fileType = 1;
+        } else if (isPDF) {
+          fileType = 3;
+        } else if (isPPTX) {
+          fileType = 4;
+        } else {
+          fileType = 2; // Video
+        }
+
         const newValue = {
           ...values,
           TenFile: fileItem.TenFile || fileItem.TenFilegoc,
-          Loai: fileItem.file.type.startsWith('image/') ? 'Hình Ảnh' : 'Video',
+          Loai: fileType,
           ThoiLuongTrinhChieu: "00:10:10",
           KichThuoc: formatFileSize(fileItem.file.size),
           TrangThai: true,
@@ -66,21 +84,36 @@ export default (props) => {
       form.resetFields();
     });
   };
-  const onone = async (e) => {
-    e.preventDefault();
+  const onone = async (index) => {
     form.validateFields().then((values) => {
       if (fileList.length < 1) {
         message.destroy();
         message.warning('Chưa chọn file đính kèm');
         return;
       }
-      const index = 0;
       const fileItem = fileList[index];
-      let tenFileValue = values.TenFile || fileItem.TenFile
+
+      // Determine file type
+      const isImage = fileItem.file.type.startsWith('image/');
+      const isPDF = fileItem.file.type === 'application/pdf';
+      const isPPTX = fileItem.file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+        fileItem.file.type === 'application/vnd.ms-powerpoint';
+
+      let fileType;
+      if (isImage) {
+        fileType = 1;
+      } else if (isPDF) {
+        fileType = 3;
+      } else if (isPPTX) {
+        fileType = 4;
+      } else {
+        fileType = 2; // Video
+      }
+
       const newValue = {
         ...values,
         TenFile: fileItem.TenFile || fileItem.TenFilegoc,
-        Loai: fileItem.file.type.startsWith('image/') ? 'Hình Ảnh' : 'Video',
+        Loai: fileType,
         ThoiLuongTrinhChieu: "00:10:10",
         KichThuoc: formatFileSize(fileItem.file.size),
         Tag: fileItem.ListTag,
@@ -274,6 +307,45 @@ export default (props) => {
                         src={URL.createObjectURL(fileItem.file)}
                         alt={fileItem.file.name}
                       />
+                    ) : fileItem.file.type === 'application/pdf' ? (
+                      <div
+                        style={{
+                          width: '100px',
+                          height: '120px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: '#f5f5f5',
+                          border: '1px solid #d9d9d9',
+                          borderRadius: '4px',
+                          marginTop: '5px',
+                        }}
+                      >
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: '40px', color: '#ff4d4f' }}>📄</div>
+                          <div style={{ fontSize: '10px', color: '#666' }}>PDF</div>
+                        </div>
+                      </div>
+                    ) : fileItem.file.type === 'application/vnd.openxmlformats-officedocument.presentationml.presentation' ||
+                      fileItem.file.type === 'application/vnd.ms-powerpoint' ? (
+                      <div
+                        style={{
+                          width: '100px',
+                          height: '120px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          backgroundColor: '#f5f5f5',
+                          border: '1px solid #d9d9d9',
+                          borderRadius: '4px',
+                          marginTop: '5px',
+                        }}
+                      >
+                        <div style={{ textAlign: 'center' }}>
+                          <div style={{ fontSize: '40px', color: '#ff6b35' }}>📊</div>
+                          <div style={{ fontSize: '10px', color: '#666' }}>PPTX</div>
+                        </div>
+                      </div>
                     ) : (
                       <video
                         style={{
@@ -327,7 +399,7 @@ export default (props) => {
                           width: '30px',
 
                         }}
-                        onClick={onone}
+                        onClick={() => onone(index)}
                       />{' '}
                       <StopOutlined
                         style={{

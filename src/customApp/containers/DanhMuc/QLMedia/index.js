@@ -11,6 +11,7 @@ import PageAction from "../../../../components/utility/pageAction";
 import Box from "../../../../components/utility/box";
 import BoxFilter from "../../../../components/utility/boxFilter";
 import { EmptyTable } from "../../../../components/utility/boxTable";
+import BoxTable from "../../../../components/utility/boxTable";
 import { useKey } from "../../../CustomHook/useKey";
 import ModalEditEdit from "./modalEdit";
 import ModalEdit from "./modalAddEdit";
@@ -56,7 +57,7 @@ const DMChiTieu = (props) => {
     queryString.parse(props.location.search)
   );
   const [filterData1, setFilterData1] = useState("");
-  console.log("filterData1", filterData1);
+
   const [keyState, setKeyState] = useState({
     key: 0,
     treeKey: 0,
@@ -364,6 +365,121 @@ const DMChiTieu = (props) => {
   const access_token = getLocalKey("access_token");
   const dataUnzip = getInfoFromToken(access_token);
   const ListNguoiDung = dataUnzip?.NguoiDung?.NguoiDungID;
+  const isAdmin = ListNguoiDung === 18; // Using 18 directly as per user request/standard, or IDS.Admin if available
+
+  // --- Table Columns for Admin ---
+  const columns = [
+    {
+      title: "STT",
+      key: "stt",
+      width: "5%",
+      align: "center",
+      render: (text, record, index) => (
+        <span>{(PageNumber - 1) * PageSize + (index + 1)}</span>
+      ),
+    },
+    {
+      title: "Tên",
+      dataIndex: "TenFile",
+      key: "TenFile",
+      width: "20%",
+    },
+    {
+      title: "Thumbnail",
+      key: "Thumbnail",
+      width: "10%",
+      align: "center",
+      render: (text, record) => {
+        return (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100%" }}>
+            {record.Loai === 1 ? (
+              <img
+                src={record.UrlFile}
+                alt={record.TenFile}
+                style={{ width: "40px", height: "40px", objectFit: "cover", borderRadius: "4px" }}
+              />
+            ) : record.Loai === 2 ? (
+              <span style={{ fontSize: "24px" }}>🎥</span>
+            ) : record.Loai === 3 ? (
+              <span style={{ fontSize: "24px" }}>📄</span>
+            ) : record.Loai === 4 ? (
+              <span style={{ fontSize: "24px" }}>📊</span>
+            ) : null}
+          </div>
+        );
+      },
+    },
+    {
+      title: "Loại",
+      dataIndex: "Loai",
+      key: "Loai",
+      width: "10%",
+      align: "center",
+      render: (loai) => {
+        const map = { 1: "Hình ảnh", 2: "Video", 3: "PDF", 4: "PowerPoint" };
+        return map[loai] || "Khác";
+      },
+    },
+    {
+      title: "Thời lượng trình chiếu",
+      dataIndex: "ThoiLuongTrinhChieu",
+      key: "ThoiLuongTrinhChieu",
+      width: "15%",
+      align: "center",
+      render: (text) => text || "---",
+    },
+    {
+      title: "Kích thước",
+      dataIndex: "KichThuoc",
+      key: "KichThuoc",
+      width: "10%",
+      align: "center",
+      render: (text) => text ? `${(text / 1024).toFixed(2)} KB` : "---",
+    },
+    {
+      title: "Trạng thái sử dụng",
+      dataIndex: "TrangThai",
+      key: "TrangThai",
+      width: "15%",
+      align: "center",
+      render: (status) => (
+        <span style={{ color: status ? "green" : "red" }}>
+          {status ? "Đang sử dụng" : "Chưa sử dụng"}
+        </span>
+      ),
+    },
+    {
+      title: "Tags",
+      dataIndex: "Tag",
+      key: "Tag",
+      width: "10%",
+      align: "center",
+      render: (text) => text || "---",
+    },
+    {
+      title: "Thao tác",
+      key: "action",
+      width: "10%",
+      align: "center",
+      render: (text, record) => (
+        <div>
+          <Tooltip title="Sửa">
+            <EditOutlined
+              style={{ fontSize: 18, marginRight: 10, cursor: "pointer", color: "#1890ff" }}
+              onClick={() => showModalEditEdit(record.ID)}
+            />
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <DeleteOutlined
+              style={{ fontSize: 18, color: "red", cursor: "pointer" }}
+              onClick={() => deleteModalAddEdit(record.ID)}
+            />
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+
   const renderTreeNodes = (data) =>
     data?.map((item) => {
       let isMenuOpen = openMenuKey === item.ThuMucID; // Kiểm tra xem menu có nên được mở không
@@ -708,6 +824,8 @@ const DMChiTieu = (props) => {
           >
             <Option value={1}>Hình ảnh</Option>
             <Option value={2}>Video</Option>
+            <Option value={3}>PDF</Option>
+            <Option value={4}>PowerPoint</Option>
           </Select>
           <Select
             // defaultValue={filterData.Status ? filterData.Status : null}
@@ -726,248 +844,296 @@ const DMChiTieu = (props) => {
             style={{ width: 300 }}
           />
         </BoxFilter>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "50px",
-            padding: "20px 0",
-          }}
-        >
-          {DanhSachMedia &&
-            DanhSachMedia.map((item, index) => (
-              <div
-                key={item.ID}
-                className="media-card"
-                style={{
-                  border: "1px solid #e8e8e8",
-                  borderRadius: "8px",
-                  overflow: "hidden",
-                  boxShadow: "0 2px 8px rgba(0,0,0,0.09)",
-                  width: "320px",
-                  transition: "all 0.3s ease",
-                  background: "#fff",
-                  ":hover": {
-                    boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
-                    transform: "translateY(-5px)",
-                  },
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow =
-                    "0 8px 16px rgba(0,0,0,0.15)";
-                  e.currentTarget.style.transform = "translateY(-5px)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow =
-                    "0 2px 8px rgba(0,0,0,0.09)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                }}
-              >
+        {isAdmin ? (
+          <div style={{ padding: "10px 0" }}>
+            <BoxTable
+              columns={columns}
+              dataSource={DanhSachMedia || []}
+              pagination={{
+                showSizeChanger: true,
+                showTotal: (total, range) =>
+                  `Từ ${range[0]} đến ${range[1]} trên ${total} kết quả`,
+                total: TotalRow,
+                current: PageNumber,
+                pageSize: PageSize,
+                onChange: onTableChange1,
+              }}
+              rowKey="ID"
+            />
+          </div>
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "50px",
+              padding: "20px 0",
+            }}
+          >
+            {DanhSachMedia &&
+              DanhSachMedia.map((item, index) => (
                 <div
+                  key={item.ID}
+                  className="media-card"
                   style={{
-                    position: "relative",
-                    height: "180px",
-                    background: "#f5f5f5",
+                    border: "1px solid #e8e8e8",
+                    borderRadius: "8px",
+                    overflow: "hidden",
+                    boxShadow: "0 2px 8px rgba(0,0,0,0.09)",
+                    width: "320px",
+                    transition: "all 0.3s ease",
+                    background: "#fff",
+                    ":hover": {
+                      boxShadow: "0 8px 16px rgba(0,0,0,0.15)",
+                      transform: "translateY(-5px)",
+                    },
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow =
+                      "0 8px 16px rgba(0,0,0,0.15)";
+                    e.currentTarget.style.transform = "translateY(-5px)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow =
+                      "0 2px 8px rgba(0,0,0,0.09)";
+                    e.currentTarget.style.transform = "translateY(0)";
                   }}
                 >
                   <div
                     style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
+                      position: "relative",
+                      height: "180px",
+                      background: "#f5f5f5",
                     }}
                   >
-                    {item.Loai === 2 ? (
-                      <video
-                        src={item.UrlFile}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                        controls
-                      />
-                    ) : (
-                      <img
-                        src={item.UrlFile}
-                        alt={item.TenFile}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
-                        }}
-                      />
-                    )}
-                  </div>
-                  <div
-                    style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "10px",
-                      padding: "4px 8px",
-                      borderRadius: "4px",
-                      background: "rgba(0,0,0,0.5)",
-                      color: "#fff",
-                      fontSize: "12px",
-                    }}
-                  >
-                    {item.Loai === 1 ? "Hình ảnh" : "Video"}
-                  </div>
-                </div>
-                <div style={{ padding: "16px" }}>
-                  <h3
-                    style={{
-                      margin: 0,
-                      fontSize: "16px",
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {item.TenFile}
-                  </h3>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      marginTop: "8px",
-                      justifyContent: "space-between",
-                    }}
-                  >
-                    <div>
-                      <span style={{ fontSize: "14px", color: "#8c8c8c" }}>
-                        {item.KichThuoc}
-                      </span>
-                    </div>
-
                     <div
                       style={{
-                        padding: "2px 8px",
-                        borderRadius: "10px",
-                        background: item.TrangThai ? "#e6f7ff" : "#f5f5f5",
-                        color: item.TrangThai ? "#1890ff" : "#8c8c8c",
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        width: "100%",
+                        height: "100%",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      {item.Loai === 1 ? (
+                        <img
+                          src={item.UrlFile}
+                          alt={item.TenFile}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                      ) : item.Loai === 2 ? (
+                        <video
+                          src={item.UrlFile}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                          controls
+                        />
+                      ) : item.Loai === 3 ? (
+                        <iframe
+                          src={item.UrlFile}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            border: "none",
+                          }}
+                          title={item.TenFile}
+                        />
+                      ) : item.Loai === 4 ? (
+                        <div
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            backgroundColor: "#f5f5f5",
+                          }}
+                        >
+                          <div style={{ textAlign: "center" }}>
+                            <div style={{ fontSize: "60px", color: "#ff6b35" }}>📊</div>
+                            <div style={{ fontSize: "14px", color: "#666", marginTop: "8px" }}>PowerPoint</div>
+                          </div>
+                        </div>
+                      ) : null}
+                    </div>
+                    <div
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                        padding: "4px 8px",
+                        borderRadius: "4px",
+                        background: "rgba(0,0,0,0.5)",
+                        color: "#fff",
                         fontSize: "12px",
                       }}
                     >
-                      {item.TrangThai ? "Đang sử dụng" : "Không sử dụng"}
+                      {item.Loai === 1 ? "Hình ảnh" : item.Loai === 2 ? "Video" : item.Loai === 3 ? "PDF" : item.Loai === 4 ? "PowerPoint" : "Unknown"}
                     </div>
                   </div>
-                  {item.ListTag && item.ListTag.length > 0 && (
-                    <div
+                  <div style={{ padding: "16px" }}>
+                    <h3
                       style={{
-                        marginTop: "8px",
-                        display: "flex",
-                        flexWrap: "wrap",
-                        gap: "4px",
+                        margin: 0,
+                        fontSize: "16px",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      {item.ListTag.map((tag, index) => (
-                        <span
-                          key={`tag-${index}-${tag}`}
-                          style={{
-                            padding: "2px 8px",
-                            background: "rgb(242, 242, 242)",
-                            borderRadius: "10px",
-                            fontSize: "12px",
-                          }}
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                      {item.TenFile}
+                    </h3>
 
-                  <div
-                    style={{
-                      marginTop: "12px",
-                      display: "flex",
-                      justifyContent: "flex-end",
-                      gap: "10px",
-                    }}
-                  >
-                    <Tooltip color="#1890ff" title="Sửa">
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        marginTop: "8px",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <div>
+                        <span style={{ fontSize: "14px", color: "#8c8c8c" }}>
+                          {item.KichThuoc}
+                        </span>
+                      </div>
+
                       <div
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "28px",
-                          height: "28px",
-                          fontSize: "25px",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                          transition: "all 0.3s ease",
-                          color: "rgba(0, 0, 0, 0.65)",
+                          padding: "2px 8px",
+                          borderRadius: "10px",
+                          background: item.TrangThai ? "#e6f7ff" : "#f5f5f5",
+                          color: item.TrangThai ? "#1890ff" : "#8c8c8c",
+                          fontSize: "12px",
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#1890ff";
-                          e.currentTarget.style.color = "#fff";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "transparent";
-                          e.currentTarget.style.color = "rgba(0, 0, 0, 0.65)";
-                        }}
-                        onClick={() => showModalEditEdit(item.ID)}
                       >
-                        <i className="fas fa-edit" />
+                        {item.TrangThai ? "Đang sử dụng" : "Không sử dụng"}
                       </div>
-                    </Tooltip>
-                    <Tooltip color="#ff4d4f" title={"Xóa"}>
+                    </div>
+                    {item.ListTag && item.ListTag.length > 0 && (
                       <div
                         style={{
+                          marginTop: "8px",
                           display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: "28px",
-                          height: "28px",
-                          fontSize: "25px",
-                          borderRadius: "4px",
-                          cursor: "pointer",
-                          transition: "all 0.3s ease",
-                          color: "rgba(0, 0, 0, 0.65)",
+                          flexWrap: "wrap",
+                          gap: "4px",
                         }}
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = "#ff4d4f";
-                          e.currentTarget.style.color = "#fff";
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = "transparent";
-                          e.currentTarget.style.color = "rgba(0, 0, 0, 0.65)";
-                        }}
-                        onClick={() => deleteModalAddEdit(item.ID)}
                       >
-                        <i className="fas fa-trash" />
+                        {item.ListTag.map((tag, index) => (
+                          <span
+                            key={`tag-${index}-${tag}`}
+                            style={{
+                              padding: "2px 8px",
+                              background: "rgb(242, 242, 242)",
+                              borderRadius: "10px",
+                              fontSize: "12px",
+                            }}
+                          >
+                            {tag}
+                          </span>
+                        ))}
                       </div>
-                    </Tooltip>
+                    )}
+
+                    <div
+                      style={{
+                        marginTop: "12px",
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        gap: "10px",
+                      }}
+                    >
+                      <Tooltip color="#1890ff" title="Sửa">
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "28px",
+                            height: "28px",
+                            fontSize: "25px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease",
+                            color: "rgba(0, 0, 0, 0.65)",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#1890ff";
+                            e.currentTarget.style.color = "#fff";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
+                            e.currentTarget.style.color = "rgba(0, 0, 0, 0.65)";
+                          }}
+                          onClick={() => showModalEditEdit(item.ID)}
+                        >
+                          <i className="fas fa-edit" />
+                        </div>
+                      </Tooltip>
+                      <Tooltip color="#ff4d4f" title={"Xóa"}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            width: "28px",
+                            height: "28px",
+                            fontSize: "25px",
+                            borderRadius: "4px",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease",
+                            color: "rgba(0, 0, 0, 0.65)",
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = "#ff4d4f";
+                            e.currentTarget.style.color = "#fff";
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = "transparent";
+                            e.currentTarget.style.color = "rgba(0, 0, 0, 0.65)";
+                          }}
+                          onClick={() => deleteModalAddEdit(item.ID)}
+                        >
+                          <i className="fas fa-trash" />
+                        </div>
+                      </Tooltip>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
-        </div>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "flex-end",
-            padding: "16px",
-          }}
-        >
-          <Pagination
-            showSizeChanger={true}
-            showTotal={(total, range) =>
-              `Từ ${range[0]} đến ${range[1]} trên ${total} kết quả`
-            }
-            total={TotalRow}
-            current={PageNumber}
-            pageSize={PageSize}
-            onChange={(page, pageSize) => onTableChange1(page, pageSize)}
-          />
-        </div>
+              ))}
+          </div>
+        )}
+
+        {/* Pagination only for Grid View if not Admin, or common? 
+            Admin has pagination inside BoxTable. 
+            Grid view has separate pagination.
+            We need to hide grid pagination if Admin.
+        */}
+        {!isAdmin && (
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Pagination
+              total={TotalRow}
+              showSizeChanger
+              pageSize={PageSize}
+              current={PageNumber}
+              onChange={onTableChange1}
+              showTotal={(total, range) =>
+                `Từ ${range[0]} đến ${range[1]} trên ${total} kết quả`
+              }
+            />
+          </div>
+        )}
+
       </Box>
       <ModalEdit
         confirmLoading={confirmLoading}

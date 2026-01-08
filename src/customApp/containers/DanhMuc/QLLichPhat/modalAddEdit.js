@@ -69,19 +69,19 @@ export default (props) => {
         ),
       };
 
-      // Handle date range for ChiaNgay = true
+      // Handle date for ChiaNgay = true
       if (dataEdit.DanhSachNgayPhats && dataEdit.DanhSachNgayPhats.length > 0) {
-        const sortedDates = [...dataEdit.DanhSachNgayPhats].sort(
-          (a, b) => new Date(a.DanhSachNgayPhat) - new Date(b.DanhSachNgayPhat)
-        );
-
-        const firstEntry = sortedDates[0];
-        const lastEntry = sortedDates[sortedDates.length - 1];
-
-        fieldsValue.NgayBatDau = dayjs(firstEntry.DanhSachNgayPhat, 'YYYY-MM-DD');
-        fieldsValue.NgayKetThuc = dayjs(lastEntry.DanhSachNgayPhat, 'YYYY-MM-DD');
-        fieldsValue.GioBatDau = dayjs(`0000/01/01 ${firstEntry.GioBatDau}`, 'YYYY/MM/DD HH:mm:ss');
-        fieldsValue.GioKetThuc = dayjs(`0000/01/01 ${firstEntry.GioKetThuc}`, 'YYYY/MM/DD HH:mm:ss');
+        const ChiTietLichPhat = dataEdit.DanhSachNgayPhats.map((item) => {
+          const ngayPhatValue = Array.isArray(item.DanhSachNgayPhat) && item.DanhSachNgayPhat.length > 0
+            ? item.DanhSachNgayPhat[0]
+            : item.DanhSachNgayPhat;
+          return {
+            NgayPhat: dayjs(ngayPhatValue),
+            GioBatDau: dayjs(`0000/01/01 ${item.GioBatDau}`, 'YYYY/MM/DD HH:mm:ss'),
+            GioKetThuc: dayjs(`0000/01/01 ${item.GioKetThuc}`, 'YYYY/MM/DD HH:mm:ss'),
+          };
+        });
+        fieldsValue.ChiTietLichPhat = ChiTietLichPhat;
       }
 
       form.setFieldsValue(fieldsValue);
@@ -153,35 +153,24 @@ export default (props) => {
         TitleMediaORDanhSachPhat: selectedMediaOrPlaylist?.Title,
       };
       if (ChiaNgay) {
-        // Generate date array from date range
-        const startDate = values.NgayBatDau;
-        const endDate = values.NgayKetThuc;
-        const gioBatDau = values.GioBatDau;
-        const gioKetThuc = values.GioKetThuc;
-
-        const DanhSachNgayPhat = [];
-        let currentDate = startDate.clone();
-
-        while (currentDate.isBefore(endDate, 'day') || currentDate.isSame(endDate, 'day')) {
-          DanhSachNgayPhat.push({
-            DanhSachNgayPhat: [currentDate.format('YYYY-MM-DDTHH:mm:ss')],
-            GioBatDau: gioBatDau.format('HH:mm:ss'),
-            GioKetThuc: gioKetThuc.format('HH:mm:ss'),
-          });
-          currentDate = currentDate.add(1, 'day');
-        }
+        const DataChiTietLichPhat = values.ChiTietLichPhat || [];
+        const DanhSachNgayPhat = DataChiTietLichPhat.map(item => ({
+          DanhSachNgayPhat: [item.NgayPhat.format('YYYY-MM-DDTHH:mm:ss')],
+          GioBatDau: item.GioBatDau.format('HH:mm:ss'),
+          GioKetThuc: item.GioKetThuc.format('HH:mm:ss'),
+        }));
 
         payload.DanhSachNgayPhat = DanhSachNgayPhat;
 
         // Remove date/time fields from payload
-        delete payload.NgayBatDau;
-        delete payload.NgayKetThuc;
+        delete payload.ChiTietLichPhat;
+        delete payload.NgayPhat;
         delete payload.GioBatDau;
         delete payload.GioKetThuc;
       } else {
         payload.DanhSachNgayPhat = [];
       }
-      console.log("submitValue");
+
       props.onCreate(payload);
     } catch (errorInfo) {
       console.error("Validation failed:", errorInfo);
@@ -333,80 +322,69 @@ export default (props) => {
         </Item>
         {ChiaNgay && (
           <>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Item
-                  label="Ngày bắt đầu"
-                  name="NgayBatDau"
-                  {...ITEM_LAYOUT}
-                  rules={[REQUIRED]}
-                >
-                  <DatePicker
-                    format="DD/MM/YYYY"
-                    placeholder="Chọn ngày bắt đầu"
-                    style={{ width: "100%" }}
-                  />
-                </Item>
-              </Col>
-              <Col span={12}>
-                <Item
-                  label="Ngày kết thúc"
-                  name="NgayKetThuc"
-                  {...ITEM_LAYOUT}
-                  rules={[
-                    REQUIRED,
-                    ({ getFieldValue }) => ({
-                      validator(_, value) {
-                        const startDate = getFieldValue('NgayBatDau');
-                        if (!value || !startDate) {
-                          return Promise.resolve();
-                        }
-                        if (value.isAfter(startDate, 'day') || value.isSame(startDate, 'day')) {
-                          return Promise.resolve();
-                        }
-                        return Promise.reject(new Error('Ngày kết thúc phải >= ngày bắt đầu'));
-                      },
-                    }),
-                  ]}
-                >
-                  <DatePicker
-                    format="DD/MM/YYYY"
-                    placeholder="Chọn ngày kết thúc"
-                    style={{ width: "100%" }}
-                  />
-                </Item>
-              </Col>
-            </Row>
-            <Row gutter={16}>
-              <Col span={12}>
-                <Item
-                  label="Giờ bắt đầu"
-                  name="GioBatDau"
-                  {...ITEM_LAYOUT}
-                  rules={[REQUIRED]}
-                >
-                  <TimePicker
-                    placeholder="Chọn giờ bắt đầu"
-                    format="HH:mm:ss"
-                    style={{ width: "100%" }}
-                  />
-                </Item>
-              </Col>
-              <Col span={12}>
-                <Item
-                  label="Giờ kết thúc"
-                  name="GioKetThuc"
-                  {...ITEM_LAYOUT}
-                  rules={[REQUIRED]}
-                >
-                  <TimePicker
-                    placeholder="Chọn giờ kết thúc"
-                    format="HH:mm:ss"
-                    style={{ width: "100%" }}
-                  />
-                </Item>
-              </Col>
-            </Row>
+            <Form.List name="ChiTietLichPhat">
+              {(fields, { add, remove }) => (
+                <>
+                  {fields.map(({ key, name, fieldKey, ...restField }) => (
+                    <Row gutter={10} key={key} style={{ display: "flex", alignItems: "flex-start", marginBottom: 10 }}>
+                      <Col span={9}>
+                        <Item
+                          {...restField}
+                          name={[name, "NgayPhat"]}
+                          fieldKey={[fieldKey, "NgayPhat"]}
+                          rules={[REQUIRED]}
+                          label="Chọn ngày"
+                        >
+                          <DatePicker
+                            format="DD/MM/YYYY"
+                            placeholder=""
+                            style={{ width: "100%" }}
+                          />
+                        </Item>
+                      </Col>
+                      <Col span={7}>
+                        <Item
+                          {...restField}
+                          name={[name, "GioBatDau"]}
+                          fieldKey={[fieldKey, "GioBatDau"]}
+                          rules={[REQUIRED]}
+                          label="Bắt đầu"
+                        >
+                          <TimePicker
+                            placeholder="Giờ bắt đầu"
+                            format="HH:mm:ss"
+                            style={{ width: "100%" }}
+                          />
+                        </Item>
+                      </Col>
+                      <Col span={7}>
+                        <Item
+                          {...restField}
+                          name={[name, "GioKetThuc"]}
+                          fieldKey={[fieldKey, "GioKetThuc"]}
+                          rules={[REQUIRED]}
+                          label="Kết thúc"
+                        >
+                          <TimePicker
+                            placeholder="Giờ kết thúc"
+                            format="HH:mm:ss"
+                            style={{ width: "100%" }}
+                          />
+                        </Item>
+                      </Col>
+                      <Col span={1} style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
+                        <DeleteOutlined onClick={() => remove(name)} style={{ color: "red", fontSize: "18px", cursor: "pointer" }} />
+                      </Col>
+                    </Row>
+                  ))}
+                  <Form.Item>
+                    <Button type="dashed" onClick={() => add()} block icon={<PlusOutlined />}>
+                      Thêm mốc thời gian mới
+                    </Button>
+                  </Form.Item>
+                </>
+              )}
+            </Form.List>
           </>
         )}
 

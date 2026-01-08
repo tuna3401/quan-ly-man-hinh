@@ -34,32 +34,32 @@ const DeviceDetailModal = ({ visible, onCancel, device }) => {
   const statusBgClass = isActive
     ? "bg-green-100 text-green-500"
     : isPaused
-    ? "bg-orange-100 text-orange-500"
-    : isExpired
-    ? "bg-red-100 text-red-500"
-    : "bg-gray-100 text-gray-500";
+      ? "bg-orange-100 text-orange-500"
+      : isExpired
+        ? "bg-red-100 text-red-500"
+        : "bg-gray-100 text-gray-500";
 
   const statusText = isActive
     ? "Đang hoạt động"
     : isPaused
-    ? "Tạm dừng"
-    : isExpired
-    ? "Hết hạn"
-    : "Không xác định";
+      ? "Tạm dừng"
+      : isExpired
+        ? "Hết hạn"
+        : "Không xác định";
 
   // Handler for device actions
   const handleResumeDevice = () => {
-    console.log("Resuming device:", device.code);
+    // console.log("Resuming device:", device.code);
     // Implement resume device logic
   };
 
   const handleRestartDevice = () => {
-    console.log("Restarting device:", device.code);
+    // console.log("Restarting device:", device.code);
     // Implement restart device logic
   };
 
   const handleShutdownDevice = () => {
-    console.log("Shutting down device:", device.code);
+    // console.log("Shutting down device:", device.code);
     // Implement shutdown device logic
   };
 

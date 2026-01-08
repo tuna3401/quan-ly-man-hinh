@@ -278,38 +278,43 @@ export default (props) => {
       dataIndex: "UrlFile",
       align: "center",
       width: "6%",
-      render: (url) => {
+      render: (url, record) => {
         if (url) {
-          if (url.startsWith("http") || url.startsWith("https")) {
-            if (
-              url.toLowerCase().endsWith(".mp4") ||
-              url.toLowerCase().endsWith(".webm")
-            ) {
-              return (
-                <video
-                  src={url}
-                  style={{
-                    width: "100%",
-                    minHeight: "150px",
-                    textAlign: "center",
-                  }}
-                  controls
-                />
-              );
-            } else {
-              return (
-                <img
-                  src={url}
-                  style={{
-                    width: "100%",
-                    height: "auto",
-                  }}
-                  alt="Media"
-                />
-              );
-            }
+          const isVideo = record.Loai === 2 || url.toLowerCase().match(/\.(mp4|webm)$/);
+          const isPDF = record.Loai === 3 || url.toLowerCase().endsWith('.pdf');
+          const isPPTX = record.Loai === 4 || url.toLowerCase().match(/\.(ppt|pptx)$/);
+
+          if (isPDF) {
+            return (
+              <div style={{ fontSize: "30px", color: "#ff4d4f", textAlign: "center" }}>📄</div>
+            );
+          } else if (isPPTX) {
+            return (
+              <div style={{ fontSize: "30px", color: "#ff6b35", textAlign: "center" }}>📊</div>
+            );
+          } else if (isVideo) {
+            return (
+              <video
+                src={url}
+                style={{
+                  width: "100%",
+                  minHeight: "150px",
+                  textAlign: "center",
+                }}
+                controls
+              />
+            );
           } else {
-            return null;
+            return (
+              <img
+                src={url}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                }}
+                alt="Media"
+              />
+            );
           }
         } else {
           return null;
@@ -495,9 +500,9 @@ export default (props) => {
       cursor: "move",
       ...(isDragging
         ? {
-            position: "relative",
-            zIndex: 9999,
-          }
+          position: "relative",
+          zIndex: 9999,
+        }
         : {}),
     };
     return (
@@ -582,9 +587,8 @@ export default (props) => {
   };
   return (
     <Modal
-      title={`${
-        actionthietlap === "edit" ? "CẬP NHẬT" : "THIẾT LẬP"
-      } DANH SÁCH PHÁT`}
+      title={`${actionthietlap === "edit" ? "CẬP NHẬT" : "THIẾT LẬP"
+        } DANH SÁCH PHÁT`}
       width={"100%"}
       bodyStyle={{
         maxHeight: "calc(100vh - 188px)",
@@ -718,6 +722,20 @@ export default (props) => {
                 >
                   Video
                 </Button>
+                <Button
+                  type={filterParams.Loai === "3" ? "primary" : "default"}
+                  onClick={() => handleSelectChange("3")}
+                  style={{ marginRight: "10px" }}
+                >
+                  PDF
+                </Button>
+                <Button
+                  type={filterParams.Loai === "4" ? "primary" : "default"}
+                  onClick={() => handleSelectChange("4")}
+                  style={{ marginRight: "10px" }}
+                >
+                  PPTX
+                </Button>
               </div>
             </BoxFilter>
             <div
@@ -777,7 +795,17 @@ export default (props) => {
                       flexShrink: 0,
                     }}
                   >
-                    {item.UrlFile?.toLowerCase().endsWith(".mp4") ? (
+                    {item.Loai === 1 || (!item.Loai && (item.UrlFile?.toLowerCase().match(/\.(jpg|jpeg|png|gif)$/) || !item.UrlFile?.toLowerCase().match(/\.(mp4|webm|pdf|ppt|pptx)$/))) ? (
+                      <img
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                        }}
+                        src={item.UrlFile}
+                        alt={item.TenFile}
+                      />
+                    ) : item.Loai === 2 || (!item.Loai && item.UrlFile?.toLowerCase().match(/\.(mp4|webm)$/)) ? (
                       <div
                         style={{
                           position: "relative",
@@ -813,17 +841,35 @@ export default (props) => {
                           </span>
                         </div>
                       </div>
-                    ) : (
-                      <img
+                    ) : item.Loai === 3 || (!item.Loai && item.UrlFile?.toLowerCase().endsWith('.pdf')) ? (
+                      <div
                         style={{
                           width: "100%",
                           height: "100%",
-                          objectFit: "cover",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#f5f5f5",
+                          border: "1px solid #d9d9d9",
                         }}
-                        src={item.UrlFile}
-                        alt={item.TenFile}
-                      />
-                    )}
+                      >
+                        <div style={{ fontSize: "24px", color: "#ff4d4f" }}>📄</div>
+                      </div>
+                    ) : item.Loai === 4 || (!item.Loai && item.UrlFile?.toLowerCase().match(/\.(ppt|pptx)$/)) ? (
+                      <div
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#f5f5f5",
+                          border: "1px solid #d9d9d9",
+                        }}
+                      >
+                        <div style={{ fontSize: "24px", color: "#ff6b35" }}>📊</div>
+                      </div>
+                    ) : null}
                   </div>
                   <div style={{ flex: 1, overflow: "hidden" }}>
                     <p

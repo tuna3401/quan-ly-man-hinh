@@ -25,6 +25,13 @@ import ModalAddEdit from "./modalAddEdit";
 import { PlusOutlined } from "@ant-design/icons";
 import PageWrap from "../../../../components/utility/PageWrap";
 import DeviceCard from "./DeviceCard";
+import BoxTable from "../../../../components/utility/boxTable";
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  getLocalKey,
+  getInfoFromToken,
+} from "../../../../helpers/utility";
+import { IDS } from "../../../../settings/constants";
 
 const QuanLyManHinh = (props) => {
   const [filterData, setFilterData] = useState({
@@ -198,6 +205,72 @@ const QuanLyManHinh = (props) => {
     ? parseInt(filterData.PageSize)
     : 6;
 
+  // --- Role Check ---
+  const token = getLocalKey("access_token");
+  const userInfo = getInfoFromToken(token);
+  const isAdmin = userInfo?.NguoiDung?.NguoiDungID === IDS.Admin;
+
+  // --- Table Columns for Admin ---
+  const columns = [
+    {
+      title: "STT",
+      width: "5%",
+      align: "center",
+      render: (text, record, index) => (
+        <span>{(PageNumber - 1) * PageSize + (index + 1)}</span>
+      ),
+    },
+    {
+      title: "Tên màn hình",
+      dataIndex: "TenManHinh",
+      width: "25%",
+    },
+    {
+      title: "Hardware Key",
+      dataIndex: "HardwareKey",
+      width: "20%",
+    },
+    {
+      title: "Mô tả",
+      dataIndex: "Mota",
+      width: "20%",
+    },
+    {
+      title: "Trạng thái",
+      dataIndex: "TrangThai",
+      align: "center",
+      width: "10%",
+      render: (text, record) => (
+        <span style={{ color: record.TrangThai ? "green" : "red" }}>
+          {record.TrangThai ? "Hoạt động" : "Ngừng hoạt động"}
+        </span>
+      ),
+    },
+    {
+      title: "Thao tác",
+      align: "center",
+      width: "10%",
+      render: (text, record) => (
+        <div>
+          <Tooltip title="Sửa">
+            <EditOutlined
+              style={{ fontSize: 18, marginRight: 10, cursor: "pointer" }}
+              onClick={() => showModalEdit(record.ManHinhID)}
+            />
+          </Tooltip>
+          <Tooltip title="Xóa">
+            <DeleteOutlined
+              style={{ fontSize: 18, color: "red", cursor: "pointer" }}
+              onClick={() => deleteModalAddEdit(record.ManHinhID)}
+            />
+          </Tooltip>
+        </div>
+      ),
+    },
+  ];
+
+
+
   return (
     <LayoutWrapper>
       <PageWrap>
@@ -219,39 +292,56 @@ const QuanLyManHinh = (props) => {
           />
         </BoxFilter>
 
-        {/* --- GRID VIEW REFACORING START --- */}
         <div style={{ padding: '20px 0' }}>
-          {DanhSachManHinh && DanhSachManHinh.length > 0 ? (
-            <Row gutter={[24, 24]}>
-              {DanhSachManHinh.map((item) => (
-                <Col xs={24} md={12} xl={8} key={item.ManHinhID}>
-                  <DeviceCard
-                    data={item}
-                    onEdit={showModalEdit}
-                    onDelete={deleteModalAddEdit}
-                  />
-                </Col>
-              ))}
-            </Row>
+          {isAdmin ? (
+            <BoxTable
+              columns={columns}
+              dataSource={DanhSachManHinh}
+              pagination={{
+                showSizeChanger: true,
+                showTotal: (total, range) =>
+                  `Từ ${range[0]} đến ${range[1]} trên ${total} kết quả`,
+                total: TotalRow,
+                current: PageNumber,
+                pageSize: PageSize,
+                onChange: onPageChange,
+              }}
+            />
           ) : (
-            <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>
-              Không có dữ liệu
-            </div>
+            <>
+              {DanhSachManHinh && DanhSachManHinh.length > 0 ? (
+                <Row gutter={[24, 24]}>
+                  {DanhSachManHinh.map((item) => (
+                    <Col xs={24} md={12} xl={8} key={item.ManHinhID}>
+                      <DeviceCard
+                        data={item}
+                        onEdit={showModalEdit}
+                        onDelete={deleteModalAddEdit}
+                      />
+                    </Col>
+                  ))}
+                </Row>
+              ) : (
+                <div style={{ textAlign: 'center', padding: '50px', color: '#888' }}>
+                  Không có dữ liệu
+                </div>
+              )}
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
+                <Pagination
+                  current={PageNumber}
+                  pageSize={PageSize}
+                  total={TotalRow}
+                  onChange={onPageChange}
+                  showSizeChanger
+                  pageSizeOptions={['6', '12', '18', '24']}
+                  showTotal={(total, range) => `Từ ${range[0]} đến ${range[1]} trên ${total} kết quả`}
+                />
+              </div>
+            </>
           )}
+
         </div>
 
-        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 20 }}>
-          <Pagination
-            current={PageNumber}
-            pageSize={PageSize}
-            total={TotalRow}
-            onChange={onPageChange}
-            showSizeChanger
-            pageSizeOptions={['6', '12', '18', '24']}
-            showTotal={(total, range) => `Từ ${range[0]} đến ${range[1]} trên ${total} kết quả`}
-          />
-        </div>
-        {/* --- GRID VIEW REFACORING END --- */}
 
       </Box>
       <ModalAddEdit

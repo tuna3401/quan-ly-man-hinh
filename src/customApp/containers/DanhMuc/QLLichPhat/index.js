@@ -153,7 +153,7 @@ const DashBoard = (props) => {
 
   // Function to handle form submission
   const submitModalAddEdit = (values) => {
-    console.log("submitModalAddEdit");
+
     setConfirmLoading(true);
     if (action === "add") {
       api
@@ -196,7 +196,7 @@ const DashBoard = (props) => {
 
   // Function to delete a schedule
   const deleteModalAddEdit = (id) => {
-    console.log(id, "id delete");
+
     Modal.confirm({
       title: "Xóa dữ liệu",
       content: "Bạn có muốn xóa lịch phát này không?",
@@ -425,7 +425,6 @@ const DashBoard = (props) => {
 
   // Add the renderListView function
   const renderListView = () => {
-    console.log(dataSchedulePlayList, "dataSchedulePlayList");
     return (
       <div className="schedule-list">
         <BoxFilter hienthi={true}>
