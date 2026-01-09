@@ -35,6 +35,20 @@ import {
 } from "../../../../helpers/utility";
 const { Item, useForm } = Form;
 
+// CSS for TimePicker OK button
+const timePickerStyle = `
+  .ant-picker-ok button {
+    background-color: #1890ff !important;
+    color: white !important;
+    border-color: #1890ff !important;
+  }
+  .ant-picker-ok button:hover {
+    background-color: #40a9ff !important;
+    border-color: #40a9ff !important;
+  }
+`;
+
+
 export default (props) => {
   const [form] = useForm();
   // const [isFormSuccess, setIsFormSuccess] = useState(true);
@@ -228,6 +242,7 @@ export default (props) => {
         </Button>,
       ]}
     >
+      <style>{timePickerStyle}</style>
       <Form form={form} name={"formDiSanTuLieu"}>
         {action !== "add" ? (
           <Item name="LichPhatID" hidden {...REQUIRED}></Item>
@@ -315,7 +330,19 @@ export default (props) => {
           {...ITEM_LAYOUT}
           rules={[REQUIRED]}
         >
-          <Select onChange={(value) => setChiaNgay(value)}>
+          <Select
+            onChange={(value) => {
+              setChiaNgay(value);
+              if (value === true) {
+                const currentList = form.getFieldValue("ChiTietLichPhat");
+                if (!currentList || currentList.length === 0) {
+                  form.setFieldsValue({
+                    ChiTietLichPhat: [{}],
+                  });
+                }
+              }
+            }}
+          >
             <Option value={true}>Tùy chỉnh</Option>
             <Option value={false}>Luôn Luôn</Option>
           </Select>

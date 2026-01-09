@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Tree, Tooltip } from "antd";
+import { Tree, Tooltip, TimePicker } from "antd";
+import dayjs from "dayjs";
 import {
   Button,
   Modal,
@@ -56,6 +57,17 @@ const customScrollbarStyle = `
   }
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     background: #3a5ce5;
+  }
+  
+  /* TimePicker OK button styling */
+  .ant-picker-ok button {
+    background-color: #1890ff !important;
+    color: white !important;
+    border-color: #1890ff !important;
+  }
+  .ant-picker-ok button:hover {
+    background-color: #40a9ff !important;
+    border-color: #40a9ff !important;
   }
 `;
 export default (props) => {
@@ -343,9 +355,15 @@ export default (props) => {
       width: "15%",
       align: "center",
       render: (_, record) => (
-        <TimeInput
-          value={record.ThoiLuongTrinhChieu}
-          onChange={(value) => handleDurationChange(value, record)}
+        <TimePicker
+          value={dayjs(record.ThoiLuongTrinhChieu, "HH:mm:ss")}
+          onChange={(time, timeString) =>
+            handleDurationChange(timeString, record)
+          }
+          format="HH:mm:ss"
+          allowClear={false}
+          showNow={false}
+          style={{ width: 100 }}
         />
       ),
     },
@@ -357,47 +375,7 @@ export default (props) => {
       render: (text, record) => renderThaoTac(record),
     },
   ];
-  const TimeInput = ({ value, onChange }) => {
-    const [inputValue, setInputValue] = useState(value || "00:00:00");
-    const handleChange = (e) => {
-      const newValue = e.target.value;
-      if (!newValue || newValue.trim() === "") {
-        setInputValue("00:00:00");
-        onChange("00:00:00");
-        return;
-      }
-      setInputValue(newValue);
-      if (/^\d{2}:\d{2}:\d{2}$/.test(newValue)) {
-        const [hours, minutes, seconds] = newValue.split(":").map(Number);
-        const adjustedHours = hours > 23 ? 0 : hours;
-        const adjustedMinutes = minutes > 59 ? 0 : minutes;
-        const adjustedSeconds = seconds > 59 ? 0 : seconds;
-        const correctedValue = `${String(adjustedHours).padStart(
-          2,
-          "0"
-        )}:${String(adjustedMinutes).padStart(2, "0")}:${String(
-          adjustedSeconds
-        ).padStart(2, "0")}`;
-        setInputValue(correctedValue);
-        onChange(correctedValue);
-      }
-    };
-    const handleBlur = () => {
-      if (!inputValue || !/^\d{2}:\d{2}:\d{2}$/.test(inputValue)) {
-        setInputValue("00:00:00");
-        onChange("00:00:00");
-      }
-    };
-    return (
-      <Input
-        value={inputValue}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        style={{ width: 100 }}
-        placeholder="hh:mm:ss"
-      />
-    );
-  };
+
   const handleDurationChange = (value, record) => {
     const newData = dataSource.map((item) => {
       if (item.ThuTu === record.ThuTu) {
