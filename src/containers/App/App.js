@@ -104,7 +104,7 @@ export class App extends Component {
                         <div className="wrapper-content">
                           <AppRouter style={{ height: "100%" }} url={url} />
                         </div>
-                        {/* Nút chuyển đổi nền */}
+
                       </Content>
                       <Footer
                         style={{
