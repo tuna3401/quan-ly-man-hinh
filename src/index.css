@@ -28,6 +28,18 @@ p {
     textarea::-webkit-scrollbar-button {
       display: none; /* Ẩn mũi tên cuộn */
     }
+
+/* TimePicker OK button styling - Global */
+.ant-picker-ok button {
+  background-color: #1890ff !important;
+  color: white !important;
+  border-color: #1890ff !important;
+}
+
+.ant-picker-ok button:hover {
+  background-color: #40a9ff !important;
+  border-color: #40a9ff !important;
+}
   
     /* Tuỳ chỉnh thanh cuộn cho các trình duyệt Firefox */
     textarea {

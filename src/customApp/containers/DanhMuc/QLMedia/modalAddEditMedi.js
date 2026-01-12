@@ -87,16 +87,35 @@ export default (props) => {
           }
 
           const isImage = fileItem.file.type.startsWith("image/");
-          const durationInSeconds = isImage
-            ? 60
-            : await getVideoDuration(fileItem.file);
-          const formattedDuration = isImage
-            ? "00:01:00"
-            : formatTime(durationInSeconds);
+          const isPDF = fileItem.file.type === "application/pdf";
+          const isPPTX = fileItem.file.type === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+            fileItem.file.type === "application/vnd.ms-powerpoint";
+
+          // Determine file type
+          let fileType;
+          if (isImage) {
+            fileType = 1;
+          } else if (isPDF) {
+            fileType = 3;
+          } else if (isPPTX) {
+            fileType = 4;
+          } else {
+            fileType = 2; // Video
+          }
+
+          // Calculate duration based on file type
+          let durationInSeconds;
+          if (isImage || isPDF || isPPTX) {
+            durationInSeconds = 60; // Default 60 seconds for images and documents
+          } else {
+            durationInSeconds = await getVideoDuration(fileItem.file);
+          }
+
+          const formattedDuration = formatTime(durationInSeconds);
           files.push(fileItem.file);
           const fileInfo = {
             TenFile: fileItem.TenFile || fileItem.TenFilegoc,
-            Loai: isImage ? 1 : 2,
+            Loai: fileType,
             ThoiLuongTrinhChieu: formattedDuration,
             KichThuoc: formatFileSize(fileItem.file.size),
             TrangThai: true,
@@ -115,7 +134,7 @@ export default (props) => {
 
         const { onCreate } = props;
         await onCreate(filesInfo, files);
-        console.log("Uploaded successfully", filesInfo, files);
+
         setLoading(false);
       } catch (error) {
         console.error("Upload failed:", error);
@@ -230,6 +249,22 @@ export default (props) => {
     }
   };
   const [selectedFolder, setSelectedFolder] = useState(null);
+
+  // Preview Modal State
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [previewTitle, setPreviewTitle] = useState("");
+  const [previewUrl, setPreviewUrl] = useState("");
+
+  const handleCancelPreview = () => {
+    setPreviewVisible(false);
+    setPreviewUrl("");
+  };
+
+  const handlePreview = (file) => {
+    setPreviewUrl(URL.createObjectURL(file));
+    setPreviewTitle(file.name);
+    setPreviewVisible(true);
+  };
   return (
     <Modal
       title={`${actionmedia === "edit" ? "Sửa" : "Thêm mới"} Media`}
@@ -392,6 +427,48 @@ export default (props) => {
                         src={URL.createObjectURL(fileItem.file)}
                         alt={fileItem.file.name}
                       />
+                    ) : fileItem.file.type === "application/pdf" ? (
+                      <div
+                        style={{
+                          width: "100px",
+                          height: "120px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#f5f5f5",
+                          border: "1px solid #d9d9d9",
+                          borderRadius: "4px",
+                          marginTop: "5px",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handlePreview(fileItem.file)}
+                        title="Click to Preview PDF"
+                      >
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ fontSize: "40px", color: "#ff4d4f" }}>📄</div>
+                          <div style={{ fontSize: "10px", color: "#666" }}>PDF</div>
+                        </div>
+                      </div>
+                    ) : fileItem.file.type === "application/vnd.openxmlformats-officedocument.presentationml.presentation" ||
+                      fileItem.file.type === "application/vnd.ms-powerpoint" ? (
+                      <div
+                        style={{
+                          width: "100px",
+                          height: "120px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                          backgroundColor: "#f5f5f5",
+                          border: "1px solid #d9d9d9",
+                          borderRadius: "4px",
+                          marginTop: "5px",
+                        }}
+                      >
+                        <div style={{ textAlign: "center" }}>
+                          <div style={{ fontSize: "40px", color: "#ff6b35" }}>📊</div>
+                          <div style={{ fontSize: "10px", color: "#666" }}>PPTX</div>
+                        </div>
+                      </div>
                     ) : (
                       <video
                         style={{
@@ -478,6 +555,20 @@ export default (props) => {
           ))}
         </Row>
       </Form>
+      <Modal
+        visible={previewVisible}
+        title={previewTitle}
+        footer={null}
+        onCancel={handleCancelPreview}
+        width="80%"
+        style={{ top: 20 }}
+      >
+        <iframe
+          src={previewUrl}
+          style={{ width: "100%", height: "80vh", border: "none" }}
+          title="PDF Preview"
+        />
+      </Modal>
     </Modal>
   );
 };

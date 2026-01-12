@@ -5,6 +5,7 @@ import {
   getInfoFromToken,
   getLocalKey,
 } from "../../../../../../helpers/utility";
+import settings from "../../../../../../settings/index";
 
 const SlideViewer = ({
   dataResult,
@@ -49,8 +50,18 @@ const SlideViewer = ({
     };
 
     const startConnection = async () => {
+      const getSocketUrl = () => {
+        try {
+          const urlObj = new URL(settings.v2Url);
+          return `${urlObj.origin}/slideHub`;
+        } catch (e) {
+          console.error("Invalid v2Url in settings:", settings.v2Url);
+          return "https://displaycms.gosol.com.vn/slideHub"; // Fallback
+        }
+      };
+
       connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://displaycms.gosol.com.vn/slideHub", {
+        .withUrl(getSocketUrl(), {
           withCredentials: false,
         })
         .build();
@@ -126,8 +137,18 @@ const SlideViewer = ({
     };
 
     const startConnection = async () => {
+      const getSocketUrl = () => {
+        try {
+          const urlObj = new URL(settings.v2Url);
+          return `${urlObj.origin}/slideHub`;
+        } catch (e) {
+          console.error("Invalid v2Url in settings:", settings.v2Url);
+          return "https://displaycms.gosol.com.vn/slideHub"; // Fallback
+        }
+      };
+
       connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://displaycms.gosol.com.vn/slideHub", {
+        .withUrl(getSocketUrl(), {
           withCredentials: false,
         })
         .build();

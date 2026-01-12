@@ -66,7 +66,7 @@ const DashBoard = (props) => {
   const [calendarDays, setCalendarDays] = useState([]);
   const dispatch = useDispatch();
   const { dataDB, loadingDB } = useSelector((state) => state.DashBoard);
-  console.log(dataDB, loadingDB, "dataDB, loadingDB");
+
   useEffect(() => {
     dispatch(actions.getInit());
   }, []);
@@ -215,9 +215,8 @@ const DashBoard = (props) => {
               ) {
                 days[dayIndex].events.push({
                   title: event.TenLichPhat,
-                  time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${
-                    event.GioKetThuc?.substring(0, 5) || "23:59"
-                  }`,
+                  time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${event.GioKetThuc?.substring(0, 5) || "23:59"
+                    }`,
                   color: color,
                   eventData: event, // Store full event data for modal
                 });
@@ -259,9 +258,8 @@ const DashBoard = (props) => {
                   ) {
                     days[dayIndex].events.push({
                       title: event.TenLichPhat,
-                      time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${
-                        event.GioKetThuc?.substring(0, 5) || "23:59"
-                      }`,
+                      time: `${event.GioBatDau?.substring(0, 5) || "00:00"} - ${event.GioKetThuc?.substring(0, 5) || "23:59"
+                        }`,
                       color: color,
                       eventData: event, // Store full event data for modal
                     });
@@ -442,20 +440,20 @@ const DashBoard = (props) => {
       status === "active"
         ? "đang hoạt động"
         : status === "paused"
-        ? "tạm dừng"
-        : status === "all"
-        ? ""
-        : "hết hạn";
+          ? "tạm dừng"
+          : status === "all"
+            ? ""
+            : "hết hạn";
 
     // Map status to API type parameter
     const typeParam =
       status === "active"
         ? 1
         : status === "paused"
-        ? 2
-        : status === "expired"
-        ? 3
-        : 0;
+          ? 2
+          : status === "expired"
+            ? 3
+            : 0;
 
     // Set loading state
     setDeviceList([]);
@@ -466,7 +464,7 @@ const DashBoard = (props) => {
     api
       .GetDevice({ type: typeParam })
       .then((res) => {
-        console.log(res, "res");
+
         if (res && res.data.Status > 0) {
           // Transform API data to match our device list format
           const devices = res.data.Data.map((device) => ({
@@ -501,7 +499,7 @@ const DashBoard = (props) => {
     const selectedDevice =
       deviceList.find((device) => device.ManHinhID === ManHinhID) ||
       deviceList[0];
-    console.log(selectedDevice, "selectedDevice");
+
     const mockDevice = {
       ...selectedDevice,
       name: selectedDevice?.name || "Go 1 - Màn hình 65",
@@ -529,8 +527,8 @@ const DashBoard = (props) => {
           event.eventData?.LoaiSuKien === 1
             ? "Danh Sách Phát"
             : event.eventData?.LoaiSuKien === 2
-            ? "Media"
-            : "Khác",
+              ? "Media"
+              : "Khác",
         contentName: event.eventData?.TenMediaORDanhSachPhat || "",
       })),
     });
@@ -714,30 +712,27 @@ const DashBoard = (props) => {
                   {calendarDays.map((day, index) => (
                     <div
                       key={index}
-                      className={`relative p-2 border border-gray-200 rounded-md min-h-[90px] ${
-                        day.day
+                      className={`relative p-2 border border-gray-200 rounded-md min-h-[90px] ${day.day
                           ? "cursor-pointer hover:bg-gray-50 hover:shadow-sm transition-all duration-200"
                           : "bg-gray-50/30"
-                      } ${day.events.length > 0 ? "shadow-sm" : ""}`}
+                        } ${day.events.length > 0 ? "shadow-sm" : ""}`}
                       onClick={() =>
                         day.day && day.events.length > 0
                           ? showScheduleDetailModal(
-                              `${day.day}/${
-                                currentMonth.match(/Tháng (\d+), (\d+)/)[1]
-                              }/${currentMonth.match(/Tháng (\d+), (\d+)/)[2]}`,
-                              day.events
-                            )
+                            `${day.day}/${currentMonth.match(/Tháng (\d+), (\d+)/)[1]
+                            }/${currentMonth.match(/Tháng (\d+), (\d+)/)[2]}`,
+                            day.events
+                          )
                           : null
                       }
                     >
                       <div
-                        className={`text-center font-medium ${
-                          day.day
+                        className={`text-center font-medium ${day.day
                             ? index % 7 === 0
                               ? ""
                               : ""
                             : "text-gray-300"
-                        }`}
+                          }`}
                       >
                         {day.day}
                       </div>
